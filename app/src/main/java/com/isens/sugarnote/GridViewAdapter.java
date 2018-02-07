@@ -12,21 +12,17 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
-/**
- * Created by BSPL on 2018-02-06.
- */
-
 public class GridViewAdapter extends BaseAdapter {
 
     private Context context;
 
     private String[] dateArray;
 
-    public GridViewAdapter(Context context) {
+    private GridViewAdapter(Context context) {
         this.context = context;
     }
 
-    public GridViewAdapter(Context context, int maxDate, int firstDay) {
+    private GridViewAdapter(Context context, int maxDate, int firstDay) {
 
         dateArray = new String[49];
 
@@ -41,7 +37,7 @@ public class GridViewAdapter extends BaseAdapter {
         for (int i = 0; i < 42; i++) {
             if (i < firstDay - 1)
                 dateArray[i + 7] = "";
-            else if (i>firstDay + maxDate - 2)
+            else if (i>=firstDay + maxDate - 1)
                 dateArray[i + 7] = "";
             else
                 dateArray[i + 7] = String.valueOf(i - firstDay + 2);
