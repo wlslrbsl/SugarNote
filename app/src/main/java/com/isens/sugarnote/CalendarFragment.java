@@ -62,7 +62,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
         drawer_layout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
-        //drawer_layout.setDrawerListener(this);
         drawer_layout.addDrawerListener(this);
 
         tv_month = (TextView) view.findViewById(R.id.tv_month);
@@ -216,5 +215,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             drawer_layout.closeDrawer(Gravity.START);
         }
     }
+
 }
 
