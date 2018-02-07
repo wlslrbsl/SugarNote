@@ -17,14 +17,20 @@ public class GridViewAdapter extends BaseAdapter {
     private Context context;
 
     private String[] dateArray;
+    private int whatDate, whatMonth, selMonth, whatYear, selYear;
 
     public GridViewAdapter(Context context) {
         this.context = context;
     }
 
-    public GridViewAdapter(Context context, int maxDate, int firstDay) {
+    public GridViewAdapter(Context context, int maxDate, int firstDay, int whatDate, int whatMonth, int selMonth, int whatYear, int selYear) {
 
         dateArray = new String[49];
+        this.whatDate = whatDate;
+        this.whatMonth = whatMonth;
+        this.selMonth = selMonth;
+        this.whatYear = whatYear;
+        this.selYear = selYear;
 
         dateArray[0] = "일";
         dateArray[1] = "월";
@@ -34,13 +40,10 @@ public class GridViewAdapter extends BaseAdapter {
         dateArray[5] = "금";
         dateArray[6] = "토";
 
-        if(firstDay == 0)
-            firstDay = 7;
-
         for (int i = 0; i < 42; i++) {
             if (i < firstDay - 1)
                 dateArray[i + 7] = "";
-            else if (i>=firstDay + maxDate - 1)
+            else if (i >= firstDay + maxDate - 1)
                 dateArray[i + 7] = "";
             else
                 dateArray[i + 7] = String.valueOf(i - firstDay + 2);
@@ -56,7 +59,7 @@ public class GridViewAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return dateArray[position];
     }
 
     @Override
@@ -79,6 +82,9 @@ public class GridViewAdapter extends BaseAdapter {
                 tv.setTextColor(context.getResources().getColor(android.R.color.holo_blue_bright));
             else
                 tv.setTextColor(Color.WHITE);
+
+            if (dateArray[position].equals(String.valueOf(whatDate)) && whatMonth == selMonth && whatYear == selYear)
+                tv.setTextColor(context.getResources().getColor(android.R.color.holo_green_light));
 
             tv.setGravity(Gravity.CENTER);
             tv.setTextSize(20f);

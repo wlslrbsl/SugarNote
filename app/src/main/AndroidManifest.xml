@@ -32,7 +32,6 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".MeasureActivity" />
         <activity android:name=".GraphActivity" />
-        <activity android:name=".CalendarActivity" />
         <activity android:name=".SettingActivity" />
         <activity android:name=".GoogleActivity" />
         <activity android:name=".AlarmActivity" />
