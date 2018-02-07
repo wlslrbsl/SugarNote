@@ -34,6 +34,9 @@ public class GridViewAdapter extends BaseAdapter {
         dateArray[5] = "금";
         dateArray[6] = "토";
 
+        if(firstDay == 0)
+            firstDay = 7;
+
         for (int i = 0; i < 42; i++) {
             if (i < firstDay - 1)
                 dateArray[i + 7] = "";
