@@ -109,7 +109,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
 
         switch (v.getId()) {
             case R.id.btn_new:
-                Toast.makeText(ac, "git test", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ac, "git 1test", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.btn_measure:
