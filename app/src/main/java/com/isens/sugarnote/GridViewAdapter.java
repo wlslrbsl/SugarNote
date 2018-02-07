@@ -18,11 +18,11 @@ public class GridViewAdapter extends BaseAdapter {
 
     private String[] dateArray;
 
-    private GridViewAdapter(Context context) {
+    public GridViewAdapter(Context context) {
         this.context = context;
     }
 
-    private GridViewAdapter(Context context, int maxDate, int firstDay) {
+    public GridViewAdapter(Context context, int maxDate, int firstDay) {
 
         dateArray = new String[49];
 
