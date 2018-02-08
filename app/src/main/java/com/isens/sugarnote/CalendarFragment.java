@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -29,6 +31,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private View view;
 
     private DrawerLayout drawer_layout;
+    private RecyclerView recycler_view;
+    private LinearLayoutManager linearLayoutManager;
 
     private GridView gv_calendar;
     private TextView tv_month, tv_year;
@@ -64,6 +68,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         drawer_layout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
         drawer_layout.addDrawerListener(this);
 
+        recycler_view = (RecyclerView) view.findViewById(R.id.recycler_view);
+
         tv_month = (TextView) view.findViewById(R.id.tv_month);
         tv_year = (TextView) view.findViewById(R.id.tv_year);
         gv_calendar = (GridView) view.findViewById(R.id.gv_calendar);
@@ -89,6 +95,15 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         btn_navi_left.setEnabled(true);
         btn_navi_right.setEnabled(true);
 
+        linearLayoutManager = new LinearLayoutManager(ac);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+
+        recycler_view.setLayoutManager(linearLayoutManager);
+
+        String[] str = {"생", "체", "신", "호", "연", "구", "실"};
+        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(ac, str);
+
+        recycler_view.setAdapter(recyclerViewAdapter);
         setToday();
         setCalendar();
         return view;

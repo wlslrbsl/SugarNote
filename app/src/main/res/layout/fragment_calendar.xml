@@ -5,12 +5,9 @@
     android:orientation="vertical"
     tools:context="com.isens.sugarnote.CalendarFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="25dp" />
-
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
+        android:layout_marginTop="25dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -25,8 +22,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="1">
 
-                <ListView
-                    android:id="@+id/lv_calendar"
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
@@ -44,11 +41,12 @@
         <LinearLayout
             android:layout_width="310dp"
             android:layout_height="match_parent"
-            android:layout_gravity="left"
+            android:layout_gravity="start"
             android:gravity="center"
             android:orientation="vertical">
 
             <LinearLayout
+                android:baselineAligned="false"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="2"
@@ -78,7 +76,6 @@
                         android:layout_height="0dp"
                         android:layout_weight="2"
                         android:gravity="bottom|center_horizontal"
-                        android:text="2월"
                         android:textColor="@android:color/white"
                         android:textSize="30sp"
                         android:textStyle="bold" />
@@ -112,7 +109,8 @@
                 android:layout_weight="7"
                 android:gravity="center"
                 android:numColumns="7"
-                android:paddingLeft="5dp" />
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"/>
 
         </LinearLayout>
 
