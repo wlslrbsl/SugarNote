@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                 try {
                     KakaoLink kakaoLink = KakaoLink.getKakaoLink(getApplicationContext());
                     KakaoTalkLinkMessageBuilder messageBuilder = kakaoLink.createKakaoTalkLinkMessageBuilder();
-                    messageBuilder.addText("카카오톡으로 공유해요2.");
+                    messageBuilder.addText("카카오톡으로 공유해요3.");
                     kakaoLink.sendMessage(messageBuilder,getApplicationContext());
                 } catch (KakaoParameterException e) {
                     e.printStackTrace();
