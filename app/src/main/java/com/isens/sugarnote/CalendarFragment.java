@@ -266,6 +266,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     void set_recycler() {
+
         String querry = "SELECT * FROM GLUCOSEDATA WHERE create_at LIKE '%" + calendar_head + "%';";
         Log.d("querry", querry);
         cursor = db.rawQuery(querry, null);

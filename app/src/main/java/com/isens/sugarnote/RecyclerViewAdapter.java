@@ -36,6 +36,27 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
         holder.recycler_time.setText(time[position]);
         holder.recycler_mealoption.setText(mealoption[position]);
         holder.recycler_sugar.setText(sugar[position]);
+
+        switch (mealoption[position]) {
+            case "식전" :
+                if(80 <= Integer.parseInt(sugar[position]) && Integer.parseInt(sugar[position]) <= 100)
+                    holder.recycler_tag.setBackgroundColor(context.getResources().getColor(android.R.color.holo_green_light));
+                else
+                    holder.recycler_tag.setBackgroundColor(context.getResources().getColor(android.R.color.holo_red_light));
+                break;
+            case "식후" :
+                if(100 <= Integer.parseInt(sugar[position]) && Integer.parseInt(sugar[position]) <= 120)
+                    holder.recycler_tag.setBackgroundColor(context.getResources().getColor(android.R.color.holo_green_light));
+                else
+                    holder.recycler_tag.setBackgroundColor(context.getResources().getColor(android.R.color.holo_red_light));
+                break;
+            case "공복" :
+                if(90 <= Integer.parseInt(sugar[position]) && Integer.parseInt(sugar[position]) <= 110)
+                    holder.recycler_tag.setBackgroundColor(context.getResources().getColor(android.R.color.holo_green_light));
+                else
+                    holder.recycler_tag.setBackgroundColor(context.getResources().getColor(android.R.color.holo_red_light));
+                break;
+        }
     }
 
     @Override
