@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
+import android.widget.Button;
 
 import com.isens.module.bloodglucosemonitor.BgmBootLoader;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitor;
@@ -60,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         reportChartFragment = new ReportChartFragment();
         reportGraphFragment = new ReportGraphFragment();
         calendarFragment = new CalendarFragment();
+
+        Button btn = (Button) findViewById(R.id.btn_navi_right);
+
 
         setFrag("HOME");
 

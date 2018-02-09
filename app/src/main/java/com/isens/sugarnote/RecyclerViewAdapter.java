@@ -6,17 +6,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+
+
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
     private Context context;
-    private String[] str;
     private RecyclerViewHolder viewHolder;
+
+    private String[] time, mealoption, sugar;
 
     private View view;
 
-    public RecyclerViewAdapter(Context context, String[] str) {
+    private int size;
+    private int count;
+
+    public RecyclerViewAdapter(Context context) {
         this.context = context;
-        this.str = str;
     }
 
     @Override
@@ -28,11 +33,31 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
 
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
-        holder.tv_recycler.setText(str[position]);
+        holder.recycler_time.setText(time[position]);
+        holder.recycler_mealoption.setText(mealoption[position]);
+        holder.recycler_sugar.setText(sugar[position]);
     }
 
     @Override
     public int getItemCount() {
-        return str.length;
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+
+        time = new String[size];
+        mealoption = new String[size];
+        sugar = new String[size];
+
+        count = 0;
+    }
+
+    public void addItem(String time, String mealoption, String sugar) {
+        this.time[count] = time;
+        this.mealoption[count] = mealoption;
+        this.sugar[count] = sugar;
+
+        count++;
     }
 }
