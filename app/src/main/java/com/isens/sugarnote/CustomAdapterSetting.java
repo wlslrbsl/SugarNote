@@ -2,6 +2,7 @@ package com.isens.sugarnote;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-
-/**
- * Created by chong on 2017-12-17.
- */
 
 public class CustomAdapterSetting extends BaseAdapter {
 
@@ -44,11 +41,11 @@ public class CustomAdapterSetting extends BaseAdapter {
 
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.listview_custom, parent, false);
+            convertView = inflater.inflate(R.layout.recyclerview_custom, parent, false);
         }
 
         iv_img = (ImageView) convertView.findViewById(R.id.iv_img);
-        tv_name = (TextView) convertView.findViewById(R.id.tv_name);
+        //tv_name = (TextView) convertView.findViewById(R.id.tv_name);
 
         settingItem = getItem(position);
 
@@ -58,7 +55,7 @@ public class CustomAdapterSetting extends BaseAdapter {
         return convertView;
     }
 
-    public void addItem(Drawable img,String name) {
+    public void addItem(Drawable img, String name) {
         CustomAdapterSettingItem item = new CustomAdapterSettingItem();
 
         item.setIcon(img);

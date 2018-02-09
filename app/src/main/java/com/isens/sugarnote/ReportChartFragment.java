@@ -102,6 +102,8 @@ public class ReportChartFragment extends Fragment implements View.OnClickListene
         if (size == 0)
             Toast.makeText(ac, "No Data", Toast.LENGTH_SHORT).show();
 
+        //cursor.moveToFirst();
+
         while (cursor.moveToNext()) {
             read_glucosedb(cursor);
 
