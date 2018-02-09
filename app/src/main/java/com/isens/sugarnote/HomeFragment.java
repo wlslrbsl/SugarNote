@@ -84,7 +84,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
 
         btn_navi_center.setBackgroundResource(R.drawable.state_btn_navi_power);
         btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_user);
-        btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_help);
+        btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_sync);
         btn_navi_right.setEnabled(true);
         btn_navi_left.setEnabled(true);
 
@@ -109,7 +109,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
 
         switch (v.getId()) {
             case R.id.btn_new:
-                Toast.makeText(ac, "git 1test", Toast.LENGTH_SHORT).show();
+
+                listener.setFrag("LIST");
                 break;
 
             case R.id.btn_measure:
@@ -151,7 +152,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 break;
 
             case R.id.btn_navi_right:
-                Toast.makeText(ac, "미구현", Toast.LENGTH_SHORT).show();
+                listener.setFrag("SYNC");
                 break;
 
             case R.id.btn_dialog_ok:

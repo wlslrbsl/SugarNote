@@ -23,17 +23,12 @@ android {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
+repositories {
+    maven { url "https://jitpack.io" }
+    maven { // this is for realm-db
+        url 'http://oss.jfrog.org/artifactory/oss-snapshot-local'
+    }
+}
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -47,4 +42,14 @@ dependencies {
     compile 'com.google.android.gms:play-services-drive:8.4.0'
     testCompile 'junit:junit:4.12'
     compile files('libs/mpandroidchartlibrary-2-2-4.jar')
+
+    compile group: 'com.kakao.sdk', name: 'kakaolink', version: project.KAKAO_SDK_VERSION
+
+
 }
+
+
+
+
+
+

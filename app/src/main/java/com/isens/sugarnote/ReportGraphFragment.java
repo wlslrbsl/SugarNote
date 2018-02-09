@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,6 +24,8 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.listener.ChartTouchListener;
+import com.github.mikephil.charting.listener.OnChartGestureListener;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -63,7 +66,9 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
     private final long timestamp_const = 86400000; //1day = 1000millisec * 60 sec * 60 minute * 24 hour
     private String firstdata_date, lastdata_date, firstdate_premeal, lastdate_premeal, firstdate_postmeal, lastdate_postmeal, firstdate_nomeal, lastdate_nomeal = null;
     private long reference_timestamp = 0, last_idx = 0, last_idx_premeal = 0, last_idx_postmeal = 0, last_idx_nomeal = 0;
+    private int x_Axix_option = 1, during_week = 1, during_month = 2;
     int max_yVal, min_yVal, max_yVal_premeal, min_yVal_premeal, max_yVal_postmeal, min_yVal_postmeal, max_yVal_nomeal, min_yVal_nomeal;
+    private int mealoption = 1;
 
     public ReportGraphFragment() {
         // Required empty public constructor
@@ -90,7 +95,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         btn_navi_left = (Button) ac.findViewById(R.id.btn_navi_left);
 
         btn_navi_center.setBackgroundResource(R.drawable.state_btn_navi_home);
-        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_user);
+        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_premeal);
         btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_chart);
 
         btn_navi_center.setOnClickListener(this);
@@ -404,6 +409,59 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
     public void init_view() {
 
         mChart = (LineChart) view.findViewById(chart);
+        mChart.setDoubleTapToZoomEnabled(false);
+        mChart.setOnChartGestureListener(new OnChartGestureListener() {
+
+            @Override
+            public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
+            }
+
+            @Override
+            public void onChartGestureEnd(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
+
+            }
+
+            @Override
+            public void onChartLongPressed(MotionEvent me) {
+            }
+
+            @Override
+            public void onChartDoubleTapped(MotionEvent me) {
+
+                if(x_Axix_option == during_week) {
+                    x_Axix_option = during_month;
+                    mChart.setVisibleXRangeMinimum(30f);
+                    mChart.moveViewToX(end);
+                    mChart.invalidate();
+                    Toast.makeText(ac, "1달", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    x_Axix_option = during_week;
+                    mChart.setVisibleXRangeMinimum(7f);
+                    mChart.moveViewToX(end);
+                    mChart.invalidate();
+                    Toast.makeText(ac, "1주", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onChartSingleTapped(MotionEvent me) {
+            }
+
+            @Override
+            public void onChartFling(MotionEvent me1, MotionEvent me2, float velocityX, float velocityY) {
+            }
+
+            @Override
+            public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
+            }
+
+            @Override
+            public void onChartTranslate(MotionEvent me, float dX, float dY) {
+            }
+
+
+        });
 
         glucose_premeal = new ArrayList<Entry>();
         glucose_postmeal = new ArrayList<Entry>();
@@ -424,31 +482,31 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         lineDataSets = new ArrayList<>();
 
         lineDataSet1 = new LineDataSet(glucose_premeal, "식전");
-        lineDataSet1.setColor(Color.parseColor("#E66D21"));
+        lineDataSet1.setColor(Color.parseColor("#FF002060"));
         lineDataSet1.setLineWidth(2);
         lineDataSet1.setDrawValues(false);
         lineDataSet1.setCircleRadius(5);
         lineDataSet1.setCircleColorHole(Color.WHITE);
         lineDataSet1.setDrawCircleHole(true);
-        lineDataSet1.setCircleColor(Color.parseColor("#E66D21"));
+        lineDataSet1.setCircleColor(Color.parseColor("#FF002060"));
 
         lineDataSet2 = new LineDataSet(glucose_postmeal, "식후");
-        lineDataSet2.setColor(Color.parseColor("#E66D21"));
-        lineDataSet1.setLineWidth(2);
+        lineDataSet2.setColor(Color.parseColor("#FF002060"));
+        lineDataSet2.setLineWidth(2);
         lineDataSet2.setDrawValues(false);
         lineDataSet2.setCircleRadius(5);
         lineDataSet2.setCircleColorHole(Color.WHITE);
         lineDataSet2.setDrawCircleHole(true);
-        lineDataSet2.setCircleColor(Color.parseColor("#E66D21"));
+        lineDataSet2.setCircleColor(Color.parseColor("#FF002060"));
 
         lineDataSet3 = new LineDataSet(glucose_nomeal, "공복");
-        lineDataSet3.setColor(Color.parseColor("#E66D21"));
-        lineDataSet1.setLineWidth(2);
+        lineDataSet3.setColor(Color.parseColor("#FF002060"));
+        lineDataSet3.setLineWidth(2);
         lineDataSet3.setDrawValues(false);
-        lineDataSet3.setCircleRadius(8);
+        lineDataSet3.setCircleRadius(5);
         lineDataSet3.setCircleColorHole(Color.WHITE);
         lineDataSet3.setDrawCircleHole(true);
-        lineDataSet3.setCircleColor(Color.parseColor("#E66D21"));
+        lineDataSet3.setCircleColor(Color.parseColor("#FF002060"));
 
         lineDataSets.add(lineDataSet1);
         //lineDataSets.add(lineDataSet2);
@@ -466,13 +524,14 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         mChart.getXAxis().setTextSize(10);
         mChart.getLegend().setEnabled(false);
-        mChart.setScaleEnabled(false);
+        mChart.setScaleYEnabled(false);
+        mChart.setScaleXEnabled(false);
         mChart.setAutoScaleMinMaxEnabled(false);
         mChart.getAxisLeft().setAxisMinValue(min_yVal_premeal);
         mChart.getAxisLeft().setAxisMaxValue(max_yVal_premeal);
         mChart.getAxisLeft().setTextSize(13);
 
-        if (true) // 확인요
+        if (x_Axix_option == during_week) // 확인요
             mChart.setVisibleXRangeMaximum(7f);
         else
             mChart.setVisibleXRangeMaximum(30f);
@@ -617,7 +676,47 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
                 break;
 
             case R.id.btn_navi_left:
-                Toast.makeText(ac, "미구현", Toast.LENGTH_SHORT).show();
+
+                if(meal_option == premeal) {
+                    meal_option = postmeal;
+                    set_XAxis();
+                    lineDataSets.remove(0);
+                    lineDataSets.add(lineDataSet2);
+                    mChart.setData(new LineData(xAXES, lineDataSets));
+                    mChart.getAxisLeft().setAxisMinValue(min_yVal_postmeal);
+                    mChart.getAxisLeft().setAxisMaxValue(max_yVal_postmeal);
+                    mChart.getData().setHighlightEnabled(false);
+
+                    btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_postmeal);
+                    Toast.makeText(ac, "식후", Toast.LENGTH_SHORT).show();
+                }
+                else if(meal_option == postmeal){
+                    meal_option = nomeal;
+                    set_XAxis();
+                    lineDataSets.remove(0);
+                    lineDataSets.add(lineDataSet3);
+                    mChart.setData(new LineData(xAXES, lineDataSets));
+                    mChart.getAxisLeft().setAxisMinValue(min_yVal_nomeal);
+                    mChart.getAxisLeft().setAxisMaxValue(max_yVal_nomeal);
+                    mChart.getData().setHighlightEnabled(false);
+                    btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_nomeal);
+                    Toast.makeText(ac, "공복", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    meal_option = premeal;
+                    set_XAxis();
+                    lineDataSets.remove(0);
+                    lineDataSets.add(lineDataSet1);
+                    mChart.setData(new LineData(xAXES, lineDataSets));
+                    mChart.getAxisLeft().setAxisMinValue(min_yVal_premeal);
+                    mChart.getAxisLeft().setAxisMaxValue(max_yVal_premeal);
+                    btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_premeal);
+                    Toast.makeText(ac, "식전", Toast.LENGTH_SHORT).show();
+                }
+
+                show_limitline();
+                mChart.invalidate();
+
                 break;
         }
     }

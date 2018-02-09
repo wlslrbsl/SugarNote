@@ -232,8 +232,6 @@ public class GoogleActivity extends AppCompatActivity implements ConnectionCallb
         super.onDestroy();
     }
 
-    private String email;
-
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
