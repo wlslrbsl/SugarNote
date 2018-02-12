@@ -40,6 +40,9 @@ import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
+
+import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
 import com.isens.module.bloodglucosemonitor.BgmBootLoader;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitor;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitorCallBack;
@@ -187,12 +190,16 @@ public class GoogleActivity extends AppCompatActivity implements ConnectionCallb
                 break;
 
             case R.id.btn_file_delete:
-                if (dbHelper == null)
-                    dbHelper = new DBHelper(getApplication(), "GLUCOSEDATA.db", null, 1);
-                db = dbHelper.getWritableDatabase();
 
-                dbHelper.clear_db();
-                showMessage("DB삭제");
+                mGoogleApiClient = new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(Plus.API)
+                        .addScope(Plus.SCOPE_PLUS_PROFILE)
+                        .build();
+
+                mGoogleApiClient.connect();
+
                 break;
 
             case R.id.btn_login:
@@ -203,12 +210,21 @@ public class GoogleActivity extends AppCompatActivity implements ConnectionCallb
                 break;
 
             case R.id.btn_file_sync:
-                Query query = new Query.Builder()
-                        .addFilter(Filters.eq(SearchableField.TITLE, "GLUCOSEDATA.db"))
-                        .build();
-                Log.i("JJ", "sync 버튼 클릭");
-                Drive.DriveApi.query(getGoogleApiClient(), query)
-                        .setResultCallback(metadataCallback);
+//                Query query = new Query.Builder()
+//                        .addFilter(Filters.eq(SearchableField.TITLE, "GLUCOSEDATA.db"))
+//                        .build();
+//                Log.i("JJ", "sync 버튼 클릭");
+//                Drive.DriveApi.query(getGoogleApiClient(), query)
+//                        .setResultCallback(metadataCallback);
+
+                if (isAPÏConnected == true) {
+                    String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
+                    showMessage(email);
+                }
+                else
+                    showMessage("Logout상태");
+
+
                 break;
 
             default:
@@ -278,13 +294,18 @@ public class GoogleActivity extends AppCompatActivity implements ConnectionCallb
         Log.i("JJ", "GoogleApiClient connection suspended");
     }
 
+
+
     public void connectAPIClient() {
         Log.i("JJ", "conncect api client");
         if (mGoogleApiClient == null) {
 
             mGoogleApiClient = new GoogleApiClient.Builder(this)
+
                     .addApi(Drive.API)
                     .addScope(Drive.SCOPE_FILE)
+                    .addApi(Plus.API)
+                    .addScope(Plus.SCOPE_PLUS_LOGIN)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .build();
@@ -484,6 +505,7 @@ public class GoogleActivity extends AppCompatActivity implements ConnectionCallb
                 });
     }
 
+
     /* 구글 드라브에 파일 있을 경우 파일 업데이트*/
     private void updateFile(DriveFile file) {
         Log.i("JJ", "업데이트 파일");
@@ -552,7 +574,7 @@ public class GoogleActivity extends AppCompatActivity implements ConnectionCallb
         for (Account account : list) {
             if (account.type.equalsIgnoreCase("com.google")) {
                 accountName = account.name;
-                manager.notifyAll();
+                //manager.notifyAll();
                 String prev_name = manager.getPreviousName(list[i]);
                 i = i + 1;
                 break;

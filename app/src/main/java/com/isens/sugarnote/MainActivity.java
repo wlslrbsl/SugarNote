@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private HomeFragment homeFragment;
     private UserFragment userFragment;
     private MeasureFragment measureFragment;
-    private ReportChartFragment reportChartFragment;
     private ReportStatisticsFragment reportStatisticsFragment;
     private ReportGraphFragment reportGraphFragment;
     private CalendarFragment calendarFragment;
@@ -126,7 +125,6 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         homeFragment = new HomeFragment();
         userFragment = new UserFragment();
         measureFragment = new MeasureFragment();
-        reportChartFragment = new ReportChartFragment();
         reportGraphFragment = new ReportGraphFragment();
         reportStatisticsFragment = new ReportStatisticsFragment();
         calendarFragment = new CalendarFragment();
@@ -179,43 +177,30 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                 tran.commit();
                 break;
             case "LIST":
+
+//                final String str = "공유할 내용";
+//                final String imgSrc = "http://cfile3.uf.tistory.com/image/215BCC41578ACAE31DFDBC";
+//                final String siteUrl = "등록한 url";
+//
+//                try {
+//                    kakaoLink = KakaoLink.getKakaoLink(getApplicationContext());
+//                    kakaoTalkLinkMessageBuilder = kakaoLink.createKakaoTalkLinkMessageBuilder();
+//                    kakaoTalkLinkMessageBuilder.addText(str);
+//                    kakaoTalkLinkMessageBuilder.addImage(imgSrc, 300, 200);
+//                    kakaoTalkLinkMessageBuilder.addWebButton("자세히 보기", siteUrl);
+//                    kakaoLink.sendMessage(kakaoTalkLinkMessageBuilder.build(), this);
+//                } catch (KakaoParameterException e) {
+//                    e.printStackTrace();
+//                }
+
                 try {
                     KakaoLink kakaoLink = KakaoLink.getKakaoLink(getApplicationContext());
-                    KakaoTalkLinkMessageBuilder messageBuilder = kakaoLink.createKakaoTalkLinkMessageBuilder();
-                    messageBuilder.addText("카카오톡으로 공유해요3.");
-                    kakaoLink.sendMessage(messageBuilder,getApplicationContext());
+                    kakaoTalkLinkMessageBuilder = kakaoLink.createKakaoTalkLinkMessageBuilder();
+                    kakaoTalkLinkMessageBuilder.addText("카카오톡으로 공유해요.");
+                    kakaoLink.sendMessage(kakaoTalkLinkMessageBuilder.build(), this);
                 } catch (KakaoParameterException e) {
                     e.printStackTrace();
                 }
-
-//                String s = "카카오 API TEST";
-//
-//                final KakaoTalkLinkMessageBuilder kakaoTalkLinkMessageBuilder
-//                        = kakaoLink.createKakaoTalkLinkMessageBuilder();
-//                try {
-//                    kakaoTalkLinkMessageBuilder.addText(s);//링크 객체에 날씨정보가 담긴 문자 넣기
-//                } catch (KakaoParameterException e) {
-//                    e.printStackTrace();
-//                }
-//                try {
-//                    kakaoLink.sendMessage(kakaoTalkLinkMessageBuilder, this);// 메시지 전송
-//                } catch (KakaoParameterException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                TextTemplate params = TextTemplate.newBuilder("Text", LinkObject.newBuilder().setWebUrl("https://developers.kakao.com").setMobileWebUrl("https://developers.kakao.com").build()).setButtonTitle("This is button").build();
-//
-//                KakaoLinkService.getInstance().sendDefault(this, params, new ResponseCallback<KakaoLinkResponse>() {
-//                    @Override
-//                    public void onFailure(ErrorResult errorResult) {
-//                        Logger.e(errorResult.toString());
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(KakaoLinkResponse result) {
-//                    }
-//                });
-
 
                 break;
 
@@ -239,8 +224,10 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                 break;
 
             case "SETTING":
-                Intent intent_setting = new Intent(this, SettingActivity.class);
-                startActivity(intent_setting);
+
+                Intent intent = new Intent(this, GoogleActivity.class);
+                startActivity(intent);
+
                 break;
 
             default:
