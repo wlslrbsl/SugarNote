@@ -109,7 +109,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
 
         switch (v.getId()) {
             case R.id.btn_new:
-
                 listener.setFrag("LIST");
                 break;
 
@@ -118,7 +117,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 break;
 
             case R.id.btn_report:
-                listener.setFrag("CHART");
+                listener.setFrag("STATISTICS");
                 break;
 
             case R.id.btn_setting:

@@ -185,6 +185,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                     selMonth = whatMonth;
                     selDate = whatDate;
                     setDrawer();
+                    calenderView();
+                    set_recycler();
                 } else {
                     Toast.makeText(ac, "미구현", Toast.LENGTH_SHORT).show();
                 }

@@ -1,14 +1,8 @@
 package com.isens.sugarnote;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.FragmentManager;
@@ -16,7 +10,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -44,11 +37,6 @@ import com.google.android.gms.drive.query.SearchableField;
 import com.isens.module.bloodglucosemonitor.BgmBootLoader;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitor;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitorCallBack;
-import com.kakao.kakaolink.KakaoLink;
-import com.kakao.kakaolink.KakaoTalkLinkMessageBuilder;
-import com.kakao.kakaolink.internal.LinkObject;
-import com.kakao.util.KakaoParameterException;
-import com.kakao.util.helper.log.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,19 +45,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
-import static com.kakao.util.helper.Utility.getPackageInfo;
 
 public class MainActivity extends AppCompatActivity implements FragmentInterActionListener, View.OnClickListener,GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private KakaoLink kakaoLink;
-    private KakaoTalkLinkMessageBuilder kakaoTalkLinkMessageBuilder;
     private DBHelper dbHelper, dbHelper2;
     private SQLiteDatabase db, db2;
     private String dbfilepath;
@@ -82,10 +62,11 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private HomeFragment homeFragment;
     private UserFragment userFragment;
     private MeasureFragment measureFragment;
-    private ReportChartFragment reportChartFragment;
     private ReportStatisticsFragment reportStatisticsFragment;
     private ReportGraphFragment reportGraphFragment;
     private CalendarFragment calendarFragment;
+    private SettingFragment settingFragment;
+
     private Dialog dialog_Sync;
     private TextView tv_dialog, btn_dialog_ok, btn_dialog_cancel;
     private SharedPreferences prefs_root, prefs_user;
@@ -126,18 +107,10 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         homeFragment = new HomeFragment();
         userFragment = new UserFragment();
         measureFragment = new MeasureFragment();
-        reportChartFragment = new ReportChartFragment();
         reportGraphFragment = new ReportGraphFragment();
         reportStatisticsFragment = new ReportStatisticsFragment();
         calendarFragment = new CalendarFragment();
-
-        try {
-            kakaoLink = KakaoLink.getKakaoLink(MainActivity.this);
-        } catch (KakaoParameterException e) {
-            e.printStackTrace();
-        }
-
-        String keynum = getKeyHash(this);
+        settingFragment = new SettingFragment();
 
         setFrag("HOME");
 
@@ -162,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                 tran.replace(R.id.fragment_container_main, measureFragment);
                 tran.commit();
                 break;
-            case "CHART":
+            case "STATISTICS":
                 tran.replace(R.id.fragment_container_main, reportStatisticsFragment);
                 tran.commit();
                 break;
@@ -179,43 +152,6 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                 tran.commit();
                 break;
             case "LIST":
-                try {
-                    KakaoLink kakaoLink = KakaoLink.getKakaoLink(getApplicationContext());
-                    KakaoTalkLinkMessageBuilder messageBuilder = kakaoLink.createKakaoTalkLinkMessageBuilder();
-                    messageBuilder.addText("카카오톡으로 공유해요3.");
-                    kakaoLink.sendMessage(messageBuilder,getApplicationContext());
-                } catch (KakaoParameterException e) {
-                    e.printStackTrace();
-                }
-
-//                String s = "카카오 API TEST";
-//
-//                final KakaoTalkLinkMessageBuilder kakaoTalkLinkMessageBuilder
-//                        = kakaoLink.createKakaoTalkLinkMessageBuilder();
-//                try {
-//                    kakaoTalkLinkMessageBuilder.addText(s);//링크 객체에 날씨정보가 담긴 문자 넣기
-//                } catch (KakaoParameterException e) {
-//                    e.printStackTrace();
-//                }
-//                try {
-//                    kakaoLink.sendMessage(kakaoTalkLinkMessageBuilder, this);// 메시지 전송
-//                } catch (KakaoParameterException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                TextTemplate params = TextTemplate.newBuilder("Text", LinkObject.newBuilder().setWebUrl("https://developers.kakao.com").setMobileWebUrl("https://developers.kakao.com").build()).setButtonTitle("This is button").build();
-//
-//                KakaoLinkService.getInstance().sendDefault(this, params, new ResponseCallback<KakaoLinkResponse>() {
-//                    @Override
-//                    public void onFailure(ErrorResult errorResult) {
-//                        Logger.e(errorResult.toString());
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(KakaoLinkResponse result) {
-//                    }
-//                });
-
 
                 break;
 
@@ -239,8 +175,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                 break;
 
             case "SETTING":
-                Intent intent_setting = new Intent(this, SettingActivity.class);
-                startActivity(intent_setting);
+                tran.replace(R.id.fragment_container_main, settingFragment);
+                tran.commit();
                 break;
 
             default:
@@ -590,21 +526,5 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
-    public static String getKeyHash(final Context context) {
-        PackageInfo packageInfo = getPackageInfo(context, PackageManager.GET_SIGNATURES);
-        if (packageInfo == null)
-            return null;
-
-        for (Signature signature : packageInfo.signatures) {
-            try {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                return Base64.encodeToString(md.digest(), Base64.NO_WRAP);
-            } catch (NoSuchAlgorithmException e) {
-
-            }
-        }
-        return null;
-    }
 
 }

@@ -672,7 +672,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
                 break;
 
             case R.id.btn_navi_right:
-                listener.setFrag("CHART");
+                listener.setFrag("STATISTICS");
                 break;
 
             case R.id.btn_navi_left:
