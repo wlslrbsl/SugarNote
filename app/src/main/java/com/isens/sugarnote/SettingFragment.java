@@ -1,6 +1,5 @@
 package com.isens.sugarnote;
 
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -14,8 +13,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,6 +31,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
     private FragmentInterActionListener listener;
 
     private Button btn_google, btn_wifi, btn_alarm, btn_device, btn_help, btn_navi_center, btn_navi_right, btn_navi_left;
+
+    private TextView tv_google_log;
 
     public SettingFragment() {
         // Required empty public constructor
@@ -74,6 +75,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
         btn_navi_right.setOnClickListener(this);
         btn_navi_left.setOnClickListener(this);
 
+        tv_google_log = (TextView) view.findViewById(R.id.tv_google_log);
+
         return view;
     }
 
@@ -82,8 +85,9 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
         switch (v.getId()) {
 
             case R.id.btn_google:
-                Intent intent_google = new Intent(ac, GoogleActivity.class);
-                startActivity(intent_google);
+                /*Intent intent_google = new Intent(ac, GoogleActivity.class);
+                startActivity(intent_google);*/
+
                 break;
 
             case R.id.btn_wifi:
