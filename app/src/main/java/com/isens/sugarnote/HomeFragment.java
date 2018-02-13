@@ -3,7 +3,6 @@ package com.isens.sugarnote;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -72,7 +70,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         userId = prefs_root.getString("LOGIN", "none");
         prefs_user = ac.getSharedPreferences(userId, 0);
 
-        btn_new = (LinearLayout) view.findViewById(R.id.btn_new);
+        btn_new = (LinearLayout) view.findViewById(R.id.btn_kakao);
         btn_measure = (LinearLayout) view.findViewById(R.id.btn_measure);
         btn_report = (LinearLayout) view.findViewById(R.id.btn_report);
         btn_setting = (LinearLayout) view.findViewById(R.id.btn_setting);
@@ -108,8 +106,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
     public void onClick(View v) {
 
         switch (v.getId()) {
-            case R.id.btn_new:
-                listener.setFrag("LIST");
+            case R.id.btn_kakao:
+                listener.setFrag("SHARE");
                 break;
 
             case R.id.btn_measure:

@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                 tran.replace(R.id.fragment_container_main, measureFragment);
                 tran.commit();
                 break;
-            case "CHART":
+            case "STATISTICS":
                 tran.replace(R.id.fragment_container_main, reportStatisticsFragment);
                 tran.commit();
                 break;
@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                 tran.replace(R.id.fragment_container_main, calendarFragment);
                 tran.commit();
                 break;
-            case "LIST":
+            case "SHARE":
 
 //                final String str = "공유할 내용";
 //                final String imgSrc = "http://cfile3.uf.tistory.com/image/215BCC41578ACAE31DFDBC";
