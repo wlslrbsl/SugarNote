@@ -2,6 +2,8 @@ package com.isens.sugarnote;
 
 import android.app.Application;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+
 /**
  * Created by BSPL on 2017-07-04.
  * 전역변수관리 클래스
@@ -14,6 +16,7 @@ public class MyApplication extends Application {
     private static boolean registerDebugMode = true;
     private static boolean flag = false;
     private static boolean isStrip = false;
+    private static GoogleApiClient mGoogleApiClient;
 
     private MyApplication() {
 
@@ -56,5 +59,13 @@ public class MyApplication extends Application {
 
     public static void setIsStrip(boolean isStrip) {
         MyApplication.isStrip = isStrip;
+    }
+
+    public static GoogleApiClient getmGoogleApiClient() {
+        return mGoogleApiClient;
+    }
+
+    public static void setmGoogleApiClient(GoogleApiClient mGoogleApiClient) {
+        MyApplication.mGoogleApiClient = mGoogleApiClient;
     }
 }

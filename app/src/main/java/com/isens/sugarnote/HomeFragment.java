@@ -20,9 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.drive.Drive;
@@ -49,12 +46,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import static android.app.Activity.RESULT_OK;
-
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener, GoogleApiClient.ConnectionCallbacks {
+public class HomeFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener {
 
     private SharedPreferences prefs_root, prefs_user;
     private SharedPreferences.Editor editor_root, editor_user;
@@ -77,9 +72,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
     private DBHelper dbHelper, dbHelper2;
     private SQLiteDatabase db, db2;
 
-    public GoogleApiClient mGoogleApiClient;
-
-    private boolean isAPIConnected;
     private boolean download_complete = false;
     private boolean createDBFlag = false;
     private boolean deleteLogFlag = false;
@@ -137,6 +129,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         btn_report.setOnClickListener(this);
         btn_setting.setOnClickListener(this);
         btn_calendar.setOnClickListener(this);
+
+        MyApplication.getmGoogleApiClient().connect();
 
         // Inflate the layout for this fragment
         return view;
@@ -225,13 +219,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                     ac.finish();
                 } else if (syncFlag) {
                     syncFlag = false;
-                    connectAPIClient();
+                    listener.connectAPIClient();
 
                     Query query = new Query.Builder()
                             .addFilter(Filters.eq(SearchableField.TITLE, "GLUCOSEDATA.db"))
                             .build();
                     Log.i("JJ", "sync 버튼 클릭");
-                    Drive.DriveApi.query(mGoogleApiClient, query)
+                    Drive.DriveApi.query(listener.getAPIClient(), query)
                             .setResultCallback(metadataCallback);
 
                     dialog_Sync.dismiss();
@@ -258,28 +252,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         }
     }
 
-    public void connectAPIClient() {
-        Log.i("JJ", "try connect api client");
-        if (mGoogleApiClient == null) {
-            Log.i("JJ", "new api client");
-            mGoogleApiClient = new GoogleApiClient.Builder(ac)
-                    .addApi(Drive.API)
-                    .addScope(Drive.SCOPE_FILE)
-                    .addConnectionCallbacks(this)
-                    .build();
-        }
-        mGoogleApiClient.connect();
-        Log.i("JJ", "connect api client");
-    }
-
     /* 구글 드라이브에 파일 없을 경우 파일 업로드*/
     void saveToDrive(final DriveFolder pFldr, final String titl,
                      final String mime, final File file) {
         Log.i("JJ", "save to drive");
-        if (mGoogleApiClient != null && pFldr != null && titl != null && mime != null && file != null)
+        if (listener.getAPIClient() != null && pFldr != null && titl != null && mime != null && file != null)
             try {
                 // create content from file
-                Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
+                Drive.DriveApi.newDriveContents(listener.getAPIClient()).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
                     @Override
                     public void onResult(DriveApi.DriveContentsResult driveContentsResult) {
                         DriveContents cont = driveContentsResult != null && driveContentsResult.getStatus().isSuccess() ?
@@ -304,7 +284,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                             MetadataChangeSet meta = new MetadataChangeSet.Builder().setTitle(titl).setMimeType(mime).build();
 
                             // now create file on GooDrive
-                            pFldr.createFile(mGoogleApiClient, meta, cont).setResultCallback(new ResultCallback<DriveFolder.DriveFileResult>() {
+                            pFldr.createFile(listener.getAPIClient(), meta, cont).setResultCallback(new ResultCallback<DriveFolder.DriveFileResult>() {
 
                                 @Override
                                 public void onResult(DriveFolder.DriveFileResult driveFileResult) {
@@ -314,7 +294,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                         showMessage("DB Upload");
                                         if (dFil != null) {
                                             // BINGO , file uploaded
-                                            dFil.getMetadata(mGoogleApiClient).setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
+                                            dFil.getMetadata(listener.getAPIClient()).setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
                                                 @Override
                                                 public void onResult(DriveResource.MetadataResult metadataResult) {
                                                     if (metadataResult != null && metadataResult.getStatus().isSuccess()) {
@@ -345,7 +325,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
         db = dbHelper.getWritableDatabase();
 
-        file.open(mGoogleApiClient, DriveFile.MODE_READ_ONLY, null)
+        file.open(listener.getAPIClient(), DriveFile.MODE_READ_ONLY, null)
                 .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
                     @Override
                     public void onResult(DriveApi.DriveContentsResult result) {
@@ -414,7 +394,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
     private void updateFile(DriveFile file) {
         Log.i("JJ", "업데이트 파일");
 
-        file.open(mGoogleApiClient, DriveFile.MODE_WRITE_ONLY, null)
+        file.open(listener.getAPIClient(), DriveFile.MODE_WRITE_ONLY, null)
                 .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
                     @Override
                     public void onResult(DriveApi.DriveContentsResult result) {
@@ -450,15 +430,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                             } finally {
                                 oos.close();
                             }
-                            contents.commit(mGoogleApiClient, null).setResultCallback(new ResultCallback<Status>() {
+                            contents.commit(listener.getAPIClient(), null).setResultCallback(new ResultCallback<Status>() {
                                 @Override
                                 public void onResult(Status result) {
                                     // Handle the response status
                                     showMessage("DB Update");
 
                                     Log.i("JJ", "Disconnect");
-                                    if (mGoogleApiClient != null) {
-                                        mGoogleApiClient.disconnect();
+                                    if (listener.getAPIClient() != null) {
+                                        listener.getAPIClient().disconnect();
                                     }
                                 }
                             });
@@ -495,7 +475,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                         dbfilepath = db.getPath();
                         File dbFile = new File(dbfilepath);
 
-                        saveToDrive(Drive.DriveApi.getRootFolder(mGoogleApiClient), "GLUCOSEDATA.db", "application/x-sqlite3", dbFile);
+                        saveToDrive(Drive.DriveApi.getRootFolder(listener.getAPIClient()), "GLUCOSEDATA.db", "application/x-sqlite3", dbFile);
                     } else {
                         mDriveId = mdbf.get(0).getDriveId();
                         DriveFile file = mDriveId.asDriveFile();
@@ -639,17 +619,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 break;
         }
         return false;
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        Log.i("JJ", "on connected");
-        isAPIConnected = true;
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i("JJ", "GoogleApiClient connection suspended");
     }
 
 }

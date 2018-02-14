@@ -2,9 +2,13 @@ package com.isens.sugarnote;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -14,14 +18,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class LogInActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.plus.Plus;
+
+public class LogInActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener/*, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks*/ {
 
     private SharedPreferences prefs_root, prefs_user;
     private SharedPreferences.Editor editor_root, editor_user;
 
     private Dialog dialog_nouser, dialog_addLog, dialog_deleteAll, dialog_debug;
 
-    private Button btn_logIn, btn_register;
+    private Button btn_google_sign_in;
     private TextView btn_dialog_ok, btn_dialog_cancel, tv_dialog, tv_copyright, tv_version;
     private ImageView btn_logo;
 
@@ -53,6 +63,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
 
         prefs_root = getSharedPreferences("ROOT", 0);
         editor_root = prefs_root.edit();
+
 
     }
 
@@ -145,11 +156,11 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
                     btn_dialog_cancel.setOnClickListener(this);
 
                     dialog_nouser.show();
-                    break;
+                } else {
+                    CustomDialogLogIn dialog = new CustomDialogLogIn(this);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.show();
                 }
-                CustomDialogLogIn dialog = new CustomDialogLogIn(this);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.show();
                 break;
 
             case R.id.btn_dialog_ok:
@@ -231,33 +242,31 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
     }
 
 /*    @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public void onConnected(Bundle connectionHint) {
+        Log.i("JJ", "on connected");
+    }
 
-        int X = (int) event.getX();
-        int Y = (int) event.getY();
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.i("JJ", "GoogleApiClient connection suspended");
+    }
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.i("JJ", "GoogleApiClient connection failed: " + result.toString());
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                if (Y < 30) {
-                    MyApplication.setFrag(true);
-                }
-                break;
-
-            case MotionEvent.ACTION_MOVE :
-                if(MyApplication.isFlag()) {
-                    Intent intent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-                    sendBroadcast(intent);
-                }
-                break;
-
-            case MotionEvent.ACTION_UP :
-                MyApplication.setFrag(false);
-                break;
-
-            default:
-                break;
+        if (!result.hasResolution()) {
+            // show the localized error dialog.
+            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
+            return;
         }
+        // Called typically when the app is not yet authorized, and authorization dialog is displayed to the user.
+        try {
+            result.startResolutionForResult(this, 1);
+//            startActivityForResult(AccountPicker.newChooseAccountIntent(null, null,
+//                    new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, true, null, null, null, null), REQ_ACCPICK);
 
-        return super.onTouchEvent(event);
+        } catch (IntentSender.SendIntentException e) {
+            Log.e("JJ", "Exception while starting resolution activity", e);
+        }
     }*/
 }

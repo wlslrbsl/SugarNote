@@ -2,18 +2,26 @@ package com.isens.sugarnote;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.util.Log;
 import android.view.WindowManager;
 
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.plus.Plus;
 import com.isens.module.bloodglucosemonitor.BgmBootLoader;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitor;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitorCallBack;
@@ -26,7 +34,7 @@ import java.security.NoSuchAlgorithmException;
 
 import static com.kakao.util.helper.Utility.getPackageInfo;
 
-public class MainActivity extends AppCompatActivity implements FragmentInterActionListener {
+public class MainActivity extends AppCompatActivity implements FragmentInterActionListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private KakaoLink kakaoLink;
     private KakaoTalkLinkMessageBuilder kakaoTalkLinkMessageBuilder;
@@ -47,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
 
     private BloodGlucoseMonitor _bloodGlucoseMonitor;
 
+    private GoogleApiClient mGoogleApiClient;
+    private boolean isAPIConnected;
 
     // BGM CB register
 
@@ -80,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         reportGraphFragment = new ReportGraphFragment();
         reportStatisticsFragment = new ReportStatisticsFragment();
         calendarFragment = new CalendarFragment();
-        settingFragment =new SettingFragment();
+        settingFragment = new SettingFragment();
 
         try {
             kakaoLink = KakaoLink.getKakaoLink(MainActivity.this);
@@ -90,8 +100,9 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
 
         String keynum = getKeyHash(this);
 
-        setFrag("HOME");
 
+
+        setFrag("HOME");
     }
 
     @Override
@@ -165,7 +176,6 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         }
     }
 
-
     public static String getKeyHash(final Context context) {
         PackageInfo packageInfo = getPackageInfo(context, PackageManager.GET_SIGNATURES);
         if (packageInfo == null)
@@ -183,4 +193,62 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         return null;
     }
 
+    @Override
+    public void connectAPIClient() {
+        Log.i("JJ", "try connect api client");
+        if (true) {
+            Log.i("JJ", "new api client");
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(Drive.API)
+                    .addScope(Drive.SCOPE_FILE)
+                    .addApi(Plus.API)
+                    .addScope(Plus.SCOPE_PLUS_LOGIN)
+                    .addOnConnectionFailedListener(this)
+                    .addConnectionCallbacks(this)
+                    .build();
+        }
+        mGoogleApiClient.connect();
+        Log.i("JJ", "connect api client");
+    }
+
+    @Override
+    public GoogleApiClient getAPIClient() {
+        return mGoogleApiClient;
+    }
+
+    @Override
+    public boolean getIsAPIConnected() {
+        return isAPIConnected;
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.i("JJ", "on connected");
+        isAPIConnected = true;
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.i("JJ", "GoogleApiClient connection suspended");
+    }
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.i("JJ", "GoogleApiClient connection failed: " + result.toString());
+
+        isAPIConnected = false;
+        if (!result.hasResolution()) {
+            // show the localized error dialog.
+            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
+            return;
+        }
+        // Called typically when the app is not yet authorized, and authorization dialog is displayed to the user.
+        try {
+            result.startResolutionForResult(this, 1);
+//            startActivityForResult(AccountPicker.newChooseAccountIntent(null, null,
+//                    new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, true, null, null, null, null), REQ_ACCPICK);
+
+        } catch (IntentSender.SendIntentException e) {
+            Log.e("JJ", "Exception while starting resolution activity", e);
+        }
+    }
 }

@@ -43,40 +43,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:gravity="center">
 
-        <Button
-            android:id="@+id/btn_logIn"
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/btn_google_sign_in"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/state_btn_gray_square"
-            android:padding="10dp"
-            android:text="로그인"
-            android:textColor="#ffffff"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content">
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center">
-
-        <Button
-            android:id="@+id/btn_register"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/state_btn_gray_square"
-            android:padding="10dp"
-            android:text="계정 생성"
-            android:textColor="#ffffff"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+        </com.google.android.gms.common.SignInButton>
 
     </LinearLayout>
 

@@ -5,7 +5,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +18,14 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.plus.Plus;
+
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SettingFragment extends Fragment implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class SettingFragment extends Fragment implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, GoogleApiClient.ConnectionCallbacks {
 
     private Activity ac;
     private View view;
@@ -77,6 +83,13 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
 
         tv_google_log = (TextView) view.findViewById(R.id.tv_google_log);
 
+        /*if (listener.getIsAPIConnected()) {
+            //listener.getAPIClient().connect();
+            tv_google_log.setText(Plus.AccountApi.getAccountName(listener.getAPIClient()));
+        } else {
+            tv_google_log.setText("LOG OUT");
+        }*/
+
         return view;
     }
 
@@ -85,9 +98,15 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
         switch (v.getId()) {
 
             case R.id.btn_google:
-                /*Intent intent_google = new Intent(ac, GoogleActivity.class);
-                startActivity(intent_google);*/
-
+                //listener.connectAPIClient();
+                Toast.makeText(ac, "머니", Toast.LENGTH_SHORT).show();
+                GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getContext())
+                        .addApi(Drive.API)
+                        .addScope(Drive.SCOPE_FILE)
+                        /*.addApi(Plus.API)
+                        .addScope(Plus.SCOPE_PLUS_LOGIN)*/
+                        .addConnectionCallbacks(this)
+                        .build();
                 break;
 
             case R.id.btn_wifi:
@@ -128,7 +147,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
                 break;
 
             case R.id.btn_help:
-                Toast.makeText(ac, "도움말 추가 예정", Toast.LENGTH_SHORT).show();
+                tv_google_log.setText(Plus.AccountApi.getAccountName(listener.getAPIClient()));
                 break;
 
             case R.id.btn_setting_save:
@@ -182,6 +201,16 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.d("JJ", "connected");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
 
     }
 }
