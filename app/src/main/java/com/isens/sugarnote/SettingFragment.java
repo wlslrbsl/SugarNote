@@ -40,6 +40,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
     private TextView tv_google_log;
 
     private DBHelper dbHelper;
+    private SQLiteDatabase db;
 
     public SettingFragment() {
         // Required empty public constructor
