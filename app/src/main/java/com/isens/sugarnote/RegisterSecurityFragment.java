@@ -42,19 +42,19 @@ public class RegisterSecurityFragment extends Fragment implements View.OnClickLi
 
     private static String animatorFlagSetting = null;
     private static int pwIndex;
-    private String password = "pw";
+    private String password = "pw", userAccount;
     private int[] pw = new int[4];
-    private int userId = 0;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getContext();
+
         prefs_root = mContext.getSharedPreferences("ROOT", 0);
-        editor_root = prefs_root.edit();
-        userId = prefs_root.getInt("USERCOUNT", 0) + 1;
-        prefs_user = mContext.getSharedPreferences(String.valueOf(userId), 0);
+        userAccount = prefs_root.getString("SIGNIN","ERROR");
+        prefs_user = mContext.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
+        editor_root = prefs_root.edit();
     }
 
     @Override
@@ -221,9 +221,8 @@ public class RegisterSecurityFragment extends Fragment implements View.OnClickLi
                     password += String.valueOf(pw[j]);
                 }
                 Toast.makeText(mContext, password, Toast.LENGTH_SHORT).show();
-                editor_root.putInt("USERCOUNT", userId);
-                editor_root.putString("LOGIN", String.valueOf(userId));
-                editor_root.commit();
+                editor_user.putBoolean("REGISTERED", true);
+                editor_user.commit();
                 fadeOutLinearLayout.start();
                 break;
 

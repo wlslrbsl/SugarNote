@@ -3,8 +3,6 @@ package com.isens.sugarnote;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -24,6 +22,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
@@ -66,7 +65,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
 
     private TextView tv_dialog, btn_dialog_ok, btn_dialog_cancel;
 
-    private String userId;
+    private String userAccount;
     private int userCount;
 
     private DBHelper dbHelper, dbHelper2;
@@ -99,8 +98,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
 
         prefs_root = ac.getSharedPreferences("ROOT", 0);
         editor_root = prefs_root.edit();
-        userId = prefs_root.getString("LOGIN", "none");
-        prefs_user = ac.getSharedPreferences(userId, 0);
+        userAccount = prefs_root.getString("SIGNIN", "none");
+        prefs_user = ac.getSharedPreferences(userAccount, 0);
+        editor_user = prefs_user.edit();
 
         btn_new = (LinearLayout) view.findViewById(R.id.btn_kakao);
         btn_measure = (LinearLayout) view.findViewById(R.id.btn_measure);
@@ -130,7 +130,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         btn_setting.setOnClickListener(this);
         btn_calendar.setOnClickListener(this);
 
-        MyApplication.getmGoogleApiClient().connect();
+        //MyApplication.getmGoogleApiClient().connect();
 
         // Inflate the layout for this fragment
         return view;
@@ -208,13 +208,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                     createDBFlag = false;
                     dialog_createDB.dismiss();
                 } else if (deleteLogFlag) {
-                    editor_user = prefs_user.edit();
                     editor_user.clear();
-
-                    userCount = prefs_root.getInt("USERCOUNT", 0);
-                    editor_root.putInt("USERCOUNT", userCount - 1);
-                    editor_root.commit();
-
+                    editor_user.commit();
                     deleteLogFlag = false;
                     ac.finish();
                 } else if (syncFlag) {
@@ -620,5 +615,4 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         }
         return false;
     }
-
 }

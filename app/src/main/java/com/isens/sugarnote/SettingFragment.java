@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -19,8 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.plus.Plus;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,6 +39,9 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
 
     private TextView tv_google_log;
 
+    private DBHelper dbHelper, dbHelper2;
+    private SQLiteDatabase db, db2;
+
     public SettingFragment() {
         // Required empty public constructor
     }
@@ -53,6 +55,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
 
         ac = getActivity();
         view = inflater.inflate(R.layout.fragment_setting, container, false);
@@ -83,13 +87,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
 
         tv_google_log = (TextView) view.findViewById(R.id.tv_google_log);
 
-        /*if (listener.getIsAPIConnected()) {
-            //listener.getAPIClient().connect();
-            tv_google_log.setText(Plus.AccountApi.getAccountName(listener.getAPIClient()));
-        } else {
-            tv_google_log.setText("LOG OUT");
-        }*/
-
         return view;
     }
 
@@ -99,14 +96,21 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
 
             case R.id.btn_google:
                 //listener.connectAPIClient();
-                Toast.makeText(ac, "머니", Toast.LENGTH_SHORT).show();
+                /*Toast.makeText(ac, "머니", Toast.LENGTH_SHORT).show();
                 GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getContext())
                         .addApi(Drive.API)
                         .addScope(Drive.SCOPE_FILE)
-                        /*.addApi(Plus.API)
-                        .addScope(Plus.SCOPE_PLUS_LOGIN)*/
+                        *//*.addApi(Plus.API)
+                        .addScope(Plus.SCOPE_PLUS_LOGIN)*//*
                         .addConnectionCallbacks(this)
-                        .build();
+                        .build();*/
+
+                if (dbHelper == null)
+                    dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+                db = dbHelper.getWritableDatabase();
+
+                dbHelper.clear_db();
+
                 break;
 
             case R.id.btn_wifi:
@@ -147,7 +151,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
                 break;
 
             case R.id.btn_help:
-                tv_google_log.setText(Plus.AccountApi.getAccountName(listener.getAPIClient()));
+                /*tv_google_log.setText(Plus.AccountApi.getAccountName(listener.getAPIClient()));*/
                 break;
 
             case R.id.btn_setting_save:

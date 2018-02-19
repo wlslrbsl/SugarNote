@@ -2,7 +2,7 @@ package com.isens.sugarnote;
 
 import android.app.Application;
 
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 
 /**
  * Created by BSPL on 2017-07-04.
@@ -16,10 +16,9 @@ public class MyApplication extends Application {
     private static boolean registerDebugMode = true;
     private static boolean flag = false;
     private static boolean isStrip = false;
-    private static GoogleApiClient mGoogleApiClient;
+    public static GoogleSignInClient mGoogleSignInClient;
 
     private MyApplication() {
-
     }
 
     public static MyApplication getInstance() {
@@ -61,11 +60,11 @@ public class MyApplication extends Application {
         MyApplication.isStrip = isStrip;
     }
 
-    public static GoogleApiClient getmGoogleApiClient() {
-        return mGoogleApiClient;
+    public static GoogleSignInClient getmGoogleSignInClient() {
+        return mGoogleSignInClient;
     }
 
-    public static void setmGoogleApiClient(GoogleApiClient mGoogleApiClient) {
-        MyApplication.mGoogleApiClient = mGoogleApiClient;
+    public static void setmGoogleSignInClient(GoogleSignInClient mGoogleSignInClient) {
+        MyApplication.mGoogleSignInClient = mGoogleSignInClient;
     }
 }

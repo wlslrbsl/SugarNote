@@ -16,9 +16,6 @@ import android.widget.TextView;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
-    SharedPreferences prefs_root, prefs_user;
-    SharedPreferences.Editor editor_root, editor_user;
-
     private Dialog dialog_endRegister;
 
     private TextView tv_dialog, btn_dialog_ok, btn_dialog_cancel;
@@ -36,8 +33,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private RegisterSecurityFragment registerSecurityFragment;
     private FragmentManager fm;
     private FragmentTransaction tran;
-
-    private int userId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

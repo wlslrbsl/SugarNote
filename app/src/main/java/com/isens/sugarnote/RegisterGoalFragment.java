@@ -36,7 +36,7 @@ public class RegisterGoalFragment extends Fragment implements View.OnClickListen
     private ObjectAnimator fadeInTextView, fadeOutTextView, fadeInLinearLayout, fadeOutLinearLayout;
     private AnimatorSet fadeInOutTextView;
 
-    private String goalPremealLow, goalPostmealLow, goalNomealLow, goalPremealHigh, goalPostmealHigh, goalNomealHigh;
+    private String goalPremealLow, goalPostmealLow, goalNomealLow, goalPremealHigh, goalPostmealHigh, goalNomealHigh, userAccount;
     private static String animatorFlagGoal;
 
     private int userId;
@@ -46,8 +46,8 @@ public class RegisterGoalFragment extends Fragment implements View.OnClickListen
         super.onCreate(savedInstanceState);
         mContext = getContext();
         prefs_root = mContext.getSharedPreferences("ROOT", 0);
-        userId = prefs_root.getInt("USERCOUNT", 0) + 1;
-        prefs_user = mContext.getSharedPreferences(String.valueOf(userId), 0);
+        userAccount = prefs_root.getString("SIGNIN","ERROR");
+        prefs_user = mContext.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
     }
 

@@ -33,10 +33,10 @@
             android:id="@+id/tv_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
             android:text="Ver 1.0.0."
-            android:textStyle="bold"
-            android:textColor="@color/color_dark_gray"/>
+            android:textColor="@color/color_dark_gray"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -44,14 +44,27 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical">
 
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/btn_google_sign_in"
+        <Button
+            android:id="@+id/btn_log_in_google"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:text="로그인"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:background="@drawable/state_btn_gray_square"/>
+
+        <TextView
+            android:id="@+id/btn_log_in_local"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-        </com.google.android.gms.common.SignInButton>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Use Local Account"
+            android:textColor="@color/darker_gray"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -65,7 +78,7 @@
             android:id="@+id/tv_copyright"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Copyright 2018. 이총명(Capstone Design) all rights reserved"
+            android:text="Copyright 2018. JJ&amp;CM all rights reserved"
             android:textSize="10sp" />
 
     </LinearLayout>

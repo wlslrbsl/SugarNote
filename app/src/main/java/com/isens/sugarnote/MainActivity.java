@@ -21,7 +21,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
-import com.google.android.gms.plus.Plus;
+/*import com.google.android.gms.plus.Plus;*/
 import com.isens.module.bloodglucosemonitor.BgmBootLoader;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitor;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitorCallBack;
@@ -46,9 +46,6 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private ReportGraphFragment reportGraphFragment;
     private CalendarFragment calendarFragment;
     private SettingFragment settingFragment;
-
-    private SharedPreferences prefs_root, prefs_user;
-    private SharedPreferences.Editor editor_root, editor_user;
 
     private FragmentManager fm;
     private FragmentTransaction tran;
@@ -99,8 +96,6 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         }
 
         String keynum = getKeyHash(this);
-
-
 
         setFrag("HOME");
     }
@@ -201,8 +196,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addApi(Drive.API)
                     .addScope(Drive.SCOPE_FILE)
-                    .addApi(Plus.API)
-                    .addScope(Plus.SCOPE_PLUS_LOGIN)
+                    /*.addApi(Plus.API)
+                    .addScope(Plus.SCOPE_PLUS_LOGIN)*/
                     .addOnConnectionFailedListener(this)
                     .addConnectionCallbacks(this)
                     .build();

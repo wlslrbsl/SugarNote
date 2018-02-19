@@ -34,7 +34,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
 
     private Button btn_navi_right, btn_navi_center, btn_navi_left;
 
-    private String userId, userName, userBirth, userGender, userHeight, userWeight;
+    private String userAccount, userName, userBirth, userGender, userHeight, userWeight;
 
     public UserFragment() {
         // Required empty public constructor
@@ -54,9 +54,9 @@ public class UserFragment extends Fragment implements View.OnClickListener {
         view = inflater.inflate(R.layout.fragment_user, container, false);
 
         prefs_root = ac.getSharedPreferences("ROOT", 0);
-        userId = prefs_root.getString("LOGIN", "none");
+        userAccount = prefs_root.getString("SIGNIN", "ERROR");
 
-        prefs_user = ac.getSharedPreferences(userId, 0);
+        prefs_user = ac.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
 
         ll_male_profile = (LinearLayout) view.findViewById(R.id.ll_male_profile);

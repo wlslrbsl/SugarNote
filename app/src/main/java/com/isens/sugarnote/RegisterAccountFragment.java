@@ -38,7 +38,7 @@ public class RegisterAccountFragment extends Fragment implements View.OnClickLis
     private ObjectAnimator fadeInTextView, fadeOutTextView, fadeInLinearLayout, fadeOutLinearLayout;
     private AnimatorSet fadeInOutTextView;
 
-    private String accountSelected;
+    private String accountSelected, userAccount;
     private static String animatorFlagAccount;
     private static boolean googleChecked, isensChecked;
     private int userId;
@@ -48,8 +48,8 @@ public class RegisterAccountFragment extends Fragment implements View.OnClickLis
         super.onCreate(savedInstanceState);
         mContext = getContext();
         prefs_root = mContext.getSharedPreferences("ROOT", 0);
-        userId = prefs_root.getInt("USERCOUNT", 0) + 1;
-        prefs_user = mContext.getSharedPreferences(String.valueOf(userId), 0);
+        userAccount = prefs_root.getString("SIGNIN","ERROR");
+        prefs_user = mContext.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
     }
 

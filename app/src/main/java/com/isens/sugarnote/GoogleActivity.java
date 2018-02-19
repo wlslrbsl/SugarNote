@@ -41,8 +41,8 @@ import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
 
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
+/*import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;*/
 import com.isens.module.bloodglucosemonitor.BgmBootLoader;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitor;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitorCallBack;
@@ -126,8 +126,8 @@ public class GoogleActivity extends AppCompatActivity implements ConnectionCallb
                 mGoogleApiClient = new GoogleApiClient.Builder(this)
                         .addConnectionCallbacks(this)
                         .addOnConnectionFailedListener(this)
-                        .addApi(Plus.API)
-                        .addScope(Plus.SCOPE_PLUS_PROFILE)
+                        /*.addApi(Plus.API)
+                        .addScope(Plus.SCOPE_PLUS_PROFILE)*/
                         .build();
 
                 mGoogleApiClient.connect();
@@ -150,8 +150,8 @@ public class GoogleActivity extends AppCompatActivity implements ConnectionCallb
 //                        .setResultCallback(metadataCallback);
 
                 if (isAPÏConnected == true) {
-                    String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
-                    showMessage(email);
+                    /*String email = Plus.AccountApi.getAccountName(mGoogleApiClient);*//*
+                    showMessage(email);*/
                 }
                 else
                     showMessage("Logout상태");
@@ -236,8 +236,8 @@ public class GoogleActivity extends AppCompatActivity implements ConnectionCallb
 
                     .addApi(Drive.API)
                     .addScope(Drive.SCOPE_FILE)
-                    .addApi(Plus.API)
-                    .addScope(Plus.SCOPE_PLUS_LOGIN)
+/*                    .addApi(Plus.API)
+                    .addScope(Plus.SCOPE_PLUS_LOGIN)*/
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .build();

@@ -2,14 +2,10 @@ package com.isens.sugarnote;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -18,26 +14,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.plus.Plus;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
-public class LogInActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener/*, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks*/ {
 
+public class LogInActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
+
+    private static final int RC_SIGN_IN = 9001;
     private SharedPreferences prefs_root, prefs_user;
     private SharedPreferences.Editor editor_root, editor_user;
 
-    private Dialog dialog_nouser, dialog_addLog, dialog_deleteAll, dialog_debug;
+    private Dialog dialog_addLog, dialog_debug;
 
-    private Button btn_google_sign_in;
-    private TextView btn_dialog_ok, btn_dialog_cancel, tv_dialog, tv_copyright, tv_version;
+    private Button btn_log_in_google;
+    private TextView btn_dialog_ok, btn_dialog_cancel, tv_dialog, tv_version, btn_log_in_local;
     private ImageView btn_logo;
 
-    private String userId;
-    private int userCount;
-    private boolean addLogFlag = false, deleteAllFlag = false, debugFlag = false;
+    private boolean addLogFlag = false, debugFlag = false, signInFlag = false;
+
+    private GoogleSignInAccount account;
+    private GoogleSignInOptions gso;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,32 +47,148 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_log_in);
 
-        tv_copyright = (TextView) findViewById(R.id.tv_copyright);
         tv_version = (TextView) findViewById(R.id.tv_version);
-
-        btn_logIn = (Button) findViewById(R.id.btn_logIn);
-        btn_register = (Button) findViewById(R.id.btn_register);
         btn_logo = (ImageView) findViewById(R.id.btn_logo);
 
-        btn_logIn.setOnClickListener(this);
-        btn_register.setOnClickListener(this);
-        btn_logo.setOnLongClickListener(this);
+        btn_log_in_local = (TextView) findViewById(R.id.btn_log_in_local);
+        btn_log_in_google = (Button) findViewById(R.id.btn_log_in_google);
 
+        btn_log_in_google.setOnClickListener(this);
+        tv_version.setOnClickListener(this);
+        btn_logo.setOnLongClickListener(this);
         tv_version.setOnLongClickListener(this);
-        tv_copyright.setOnLongClickListener(this);
 
         prefs_root = getSharedPreferences("ROOT", 0);
         editor_root = prefs_root.edit();
 
-
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        MyApplication.mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        MyApplication.mGoogleSignInClient.signOut();
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+
+            case R.id.btn_log_in_google:
+                Intent signInIntent = MyApplication.mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+
+                signInFlag = true;
+
+                break;
+
+            case R.id.tv_version:
+                //account = GoogleSignIn.getLastSignedInAccount(this);
+                /*revoke();
+                if (account != null) {
+                    //tv_test.setText(account.getDisplayName() + "\n" + account.getEmail() + "\n" + account.getGivenName() + "\n" + account.getFamilyName() + "\n" + account.getId());
+                }*/
+                break;
+
+            case R.id.btn_dialog_ok:
+                if (addLogFlag == true) {
+                    addLogFlag = false;
+                    createUser(); // dummy user 생산
+                    dialog_addLog.dismiss();
+                } else if (debugFlag == true) {
+                    debugFlag = false;
+                    MyApplication.setRegisterDebugMode(true);
+                    Toast.makeText(this, "디버그 모드 : enable", Toast.LENGTH_SHORT).show();
+                    dialog_debug.dismiss();
+                } else {
+
+                    Intent intent = new Intent(this, RegisterActivity.class);
+                    startActivity(intent);
+                }
+                break;
+
+            case R.id.btn_dialog_cancel:
+                if (addLogFlag == true) {
+                    addLogFlag = false;
+                    dialog_addLog.dismiss();
+                } else if (debugFlag == true) {
+                    debugFlag = false;
+                    MyApplication.setRegisterDebugMode(false);
+                    Toast.makeText(this, "디버그 모드 : disable", Toast.LENGTH_SHORT).show();
+                    dialog_debug.dismiss();
+                } else {
+
+                }
+                break;
+        }
+    }
+
+    public void revoke() {
+        MyApplication.mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(LogInActivity.this, "revoked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+
+            if (signInFlag) {
+                editor_root.putString("SIGNIN", account.getEmail());
+                editor_root.commit();
+
+                prefs_user = getSharedPreferences(account.getEmail(), 0);
+
+                if (!prefs_user.getBoolean("REGISTERED", false)) {
+                    Intent intentRegister = new Intent(this, RegisterActivity.class);
+                    startActivity(intentRegister);
+                } else {
+                    Intent intentMain = new Intent(this, MainActivity.class);
+                    startActivity(intentMain);
+                }
+            }
+        }
+    }
+
+    void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            account = completedTask.getResult(ApiException.class);
+        } catch (ApiException e) {
+            signInFlag = false;
+        }
+    }
+
+    private void createUser() {
+
+        prefs_user = getSharedPreferences("chong00516@gmail.com", 0);
+        editor_user = prefs_user.edit();
+        editor_user.putString("NAME", "이총명");
+        editor_user.putString("BIRTH", "19910516");
+        editor_user.putString("HEIGHT", "173");
+        editor_user.putString("WEIGHT", "65");
+        editor_user.putString("GENDER", "남");
+        editor_user.putBoolean("REGISTERED", true);
+        editor_user.commit();
+    }
 
     @Override
     public boolean onLongClick(View v) {
 
         switch (v.getId()) {
-            case R.id.tv_copyright:
+
+            case R.id.tv_version:
                 dialog_addLog = new Dialog(this);
                 dialog_addLog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog_addLog.setContentView(R.layout.dialog_default);
@@ -89,25 +205,6 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
 
                 addLogFlag = true;
                 dialog_addLog.show();
-                break;
-
-            case R.id.tv_version:
-                dialog_deleteAll = new Dialog(this);
-                dialog_deleteAll.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog_deleteAll.setContentView(R.layout.dialog_default);
-
-                tv_dialog = (TextView) dialog_deleteAll.findViewById(R.id.tv_dialog);
-                tv_dialog.setText("모든 계정을 삭제하시겠습니까?");
-
-                btn_dialog_ok = (TextView) dialog_deleteAll.findViewById(R.id.btn_dialog_ok);
-                btn_dialog_cancel = (TextView) dialog_deleteAll.findViewById(R.id.btn_dialog_cancel);
-                btn_dialog_cancel.setText("아니요");
-
-                btn_dialog_ok.setOnClickListener(this);
-                btn_dialog_cancel.setOnClickListener(this);
-
-                deleteAllFlag = true;
-                dialog_deleteAll.show();
                 break;
 
             case R.id.btn_logo:
@@ -136,137 +233,4 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         }
         return false;
     }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btn_logIn:
-                if (prefs_root.getInt("USERCOUNT", 0) == 0) {
-                    dialog_nouser = new Dialog(this);
-                    dialog_nouser.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    dialog_nouser.setContentView(R.layout.dialog_default);
-
-                    btn_dialog_ok = (TextView) dialog_nouser.findViewById(R.id.btn_dialog_ok);
-                    btn_dialog_cancel = (TextView) dialog_nouser.findViewById(R.id.btn_dialog_cancel);
-                    tv_dialog = (TextView) dialog_nouser.findViewById(R.id.tv_dialog);
-
-                    tv_dialog.setText("등록된 계정이 없습니다.\n새로운 계정을 생성하시겠습니까?");
-
-                    btn_dialog_ok.setOnClickListener(this);
-                    btn_dialog_cancel.setOnClickListener(this);
-
-                    dialog_nouser.show();
-                } else {
-                    CustomDialogLogIn dialog = new CustomDialogLogIn(this);
-                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    dialog.show();
-                }
-                break;
-
-            case R.id.btn_dialog_ok:
-                if (addLogFlag == true) {
-                    addLogFlag = false;
-                    createUser(); // dummy user 생산
-                    dialog_addLog.dismiss();
-                } else if (deleteAllFlag == true) {
-                    deleteAllFlag = false;
-                    deleteAllUser(); // 모든 유저 정보 삭제
-                    dialog_deleteAll.dismiss();
-                } else if(debugFlag == true) {
-                    debugFlag = false;
-                    MyApplication.setRegisterDebugMode(true);
-                    Toast.makeText(this, "디버그 모드 : enable", Toast.LENGTH_SHORT).show();
-                    dialog_debug.dismiss();
-                } else {
-                    dialog_nouser.dismiss();
-                    Intent intent = new Intent(this, RegisterActivity.class);
-                    startActivity(intent);
-                }
-                break;
-
-            case R.id.btn_dialog_cancel:
-                if (addLogFlag == true) {
-                    addLogFlag = false;
-                    dialog_addLog.dismiss();
-                } else if (deleteAllFlag == true) {
-                    dialog_deleteAll.dismiss();
-                } else if(debugFlag == true) {
-                    debugFlag =false;
-                    MyApplication.setRegisterDebugMode(false);
-                    Toast.makeText(this, "디버그 모드 : disable", Toast.LENGTH_SHORT).show();
-                    dialog_debug.dismiss();
-                } else {
-                    dialog_nouser.dismiss();
-                }
-                break;
-
-            case R.id.btn_register:
-                Intent intent_register = new Intent(this, RegisterActivity.class);
-                startActivity(intent_register);
-                break;
-
-            case R.id.tv_version:
-                Intent intent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-                sendBroadcast(intent);
-                break;
-        }
-    }
-
-    private void deleteAllUser() {
-        for (int i = 1; i <= prefs_root.getInt("USERCOUNT", 0); i++) {
-            prefs_user = getSharedPreferences(String.valueOf(i), 0);
-            editor_user = prefs_user.edit();
-            editor_user.clear();
-            editor_user.commit();
-
-            editor_root.putInt("USERCOUNT", 0);
-            editor_root.commit();
-        }
-    }
-
-    private void createUser() {
-        userCount = prefs_root.getInt("USERCOUNT", 0);
-        userId = String.valueOf(userCount + 1);
-
-        prefs_user = getSharedPreferences(userId, 0);
-        editor_user = prefs_user.edit();
-        editor_user.putString("NAME", "이총명");
-        editor_user.putString("BIRTH", "19910516");
-        editor_user.putString("HEIGHT", "173");
-        editor_user.putString("WEIGHT", "65");
-        editor_user.putString("GENDER", "남");
-        editor_user.commit();
-
-        editor_root.putInt("USERCOUNT", userCount + 1);
-        editor_root.commit();
-    }
-
-/*    @Override
-    public void onConnected(Bundle connectionHint) {
-        Log.i("JJ", "on connected");
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i("JJ", "GoogleApiClient connection suspended");
-    }
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        Log.i("JJ", "GoogleApiClient connection failed: " + result.toString());
-
-        if (!result.hasResolution()) {
-            // show the localized error dialog.
-            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
-            return;
-        }
-        // Called typically when the app is not yet authorized, and authorization dialog is displayed to the user.
-        try {
-            result.startResolutionForResult(this, 1);
-//            startActivityForResult(AccountPicker.newChooseAccountIntent(null, null,
-//                    new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, true, null, null, null, null), REQ_ACCPICK);
-
-        } catch (IntentSender.SendIntentException e) {
-            Log.e("JJ", "Exception while starting resolution activity", e);
-        }
-    }*/
 }

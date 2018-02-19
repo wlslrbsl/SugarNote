@@ -43,7 +43,7 @@ public class RegisterProfileFragment extends Fragment implements AnimatorSet.Ani
     private ObjectAnimator fadeInTextView, fadeOutTextView, fadeInLinearLayout, fadeOutLinearLayout;
     private AnimatorSet fadeInOutTextView;
 
-    private String userName, userBirth, userGender = "남";
+    private String userAccount, userName, userBirth, userGender = "남";
     private static String animatorFlagPorfile = null;
 
     private int userId = 0;
@@ -53,8 +53,8 @@ public class RegisterProfileFragment extends Fragment implements AnimatorSet.Ani
         super.onCreate(savedInstanceState);
         mContext = getContext();
         prefs_root = mContext.getSharedPreferences("ROOT", 0);
-        userId = prefs_root.getInt("USERCOUNT", 0) + 1;
-        prefs_user = mContext.getSharedPreferences(String.valueOf(userId), 0);
+        userAccount = prefs_root.getString("SIGNIN","ERROR");
+        prefs_user = mContext.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
     }
 
