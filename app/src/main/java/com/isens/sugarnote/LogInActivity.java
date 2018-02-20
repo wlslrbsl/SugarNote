@@ -11,6 +11,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,8 +31,9 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
 
     private Dialog dialog_addLog, dialog_debug;
 
+    private LinearLayout btn_log_in_local;
     private Button btn_log_in_google;
-    private TextView btn_dialog_ok, btn_dialog_cancel, tv_dialog, tv_version, btn_log_in_local;
+    private TextView btn_dialog_ok, btn_dialog_cancel, tv_dialog, tv_version;
     private ImageView btn_logo;
 
     private boolean addLogFlag = false, debugFlag = false, signInFlag = false;
@@ -50,10 +52,11 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         tv_version = (TextView) findViewById(R.id.tv_version);
         btn_logo = (ImageView) findViewById(R.id.btn_logo);
 
-        btn_log_in_local = (TextView) findViewById(R.id.btn_log_in_local);
+        btn_log_in_local = (LinearLayout) findViewById(R.id.btn_log_in_local);
         btn_log_in_google = (Button) findViewById(R.id.btn_log_in_google);
 
         btn_log_in_google.setOnClickListener(this);
+        btn_log_in_local.setOnClickListener(this);
         tv_version.setOnClickListener(this);
         btn_logo.setOnLongClickListener(this);
         tv_version.setOnLongClickListener(this);
@@ -83,6 +86,19 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
 
                 signInFlag = true;
 
+                break;
+
+            case R.id.btn_log_in_local:
+                editor_root.putString("SIGNIN", "LOCAL");
+                editor_root.commit();
+                prefs_user = getSharedPreferences("LOCAL",0);
+                if(prefs_user.getBoolean("REGISTERED", false)) {
+                    Intent intent_main = new Intent(LogInActivity.this, MainActivity.class);
+                    startActivity(intent_main);
+                } else {
+                    Intent intent_register = new Intent(LogInActivity.this, RegisterActivity.class);
+                    startActivity(intent_register);
+                }
                 break;
 
             case R.id.tv_version:

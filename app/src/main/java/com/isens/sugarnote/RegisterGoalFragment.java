@@ -56,6 +56,8 @@ public class RegisterGoalFragment extends Fragment implements View.OnClickListen
                              Bundle savedInstanceState) {
 
         ac = getActivity();
+        view = inflater.inflate(R.layout.fragment_register_goal, container, false);
+
         btn_next_register = (Button) ac.findViewById(R.id.btn_next_register);
         btn_back_register = (Button) ac.findViewById(R.id.btn_back_register);
         btn_dot_register_4 = (LinearLayout) ac.findViewById(R.id.btn_dot_register_4);
@@ -66,18 +68,15 @@ public class RegisterGoalFragment extends Fragment implements View.OnClickListen
         btn_back_register.setEnabled(true);
         btn_next_register.setEnabled(true);
 
-
-        view = inflater.inflate(R.layout.fragment_register_goal, container, false);
-
         ll_seekbar_premeal = (LinearLayout) view.findViewById(R.id.ll_seekbar_premeal);
         ll_seekbar_postmeal = (LinearLayout) view.findViewById(R.id.ll_seekbar_postmeal);
         ll_seekbar_nomeal = (LinearLayout) view.findViewById(R.id.ll_seekbar_nomeal);
         ll_input_goal = (LinearLayout) view.findViewById(R.id.ll_input_goal);
         tv_register_goal = (TextView) view.findViewById(R.id.tv_register_goal);
 
-        createRangeSeekbar();
         createAnimator();
         creatAnimatorSet();
+        createRangeSeekbar();
 
         animatorFlagGoal = "start";
         tv_register_goal.setText("혈당 목표치를 설정해주세요.");

@@ -51,20 +51,34 @@
             android:id="@+id/btn_log_in_google"
             android:layout_width="200dp"
             android:layout_height="50dp"
+            android:textStyle="bold"
             android:text="로그인"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:background="@drawable/state_btn_gray_square"/>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/btn_log_in_local"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Use Local Account"
-            android:textColor="@color/darker_gray"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/state_tv_local_account"
+                android:text="@string/login_without"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:text="  without Account"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

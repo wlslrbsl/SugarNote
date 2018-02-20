@@ -46,8 +46,6 @@ public class RegisterProfileFragment extends Fragment implements AnimatorSet.Ani
     private String userAccount, userName, userBirth, userGender = "남";
     private static String animatorFlagPorfile = null;
 
-    private int userId = 0;
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

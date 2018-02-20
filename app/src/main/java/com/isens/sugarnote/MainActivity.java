@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private ReportGraphFragment reportGraphFragment;
     private CalendarFragment calendarFragment;
     private SettingFragment settingFragment;
+    private UserGoalFragment userGoalFragment;
+    private AlarmFragment alarmFragment;
 
     private FragmentManager fm;
     private FragmentTransaction tran;
@@ -88,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         reportStatisticsFragment = new ReportStatisticsFragment();
         calendarFragment = new CalendarFragment();
         settingFragment = new SettingFragment();
+        userGoalFragment = new UserGoalFragment();
+        alarmFragment = new AlarmFragment();
 
         try {
             kakaoLink = KakaoLink.getKakaoLink(MainActivity.this);
@@ -166,6 +170,13 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                 }
                 break;
 
+            case "GOAL":
+                tran.replace(R.id.fragment_container_main, userGoalFragment);
+                tran.commit();
+                break;
+            case "ALARM" :
+                tran.replace(R.id.fragment_container_main, alarmFragment);
+                tran.commit();
             default:
                 break;
         }
@@ -226,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     public void onConnectionSuspended(int cause) {
         Log.i("JJ", "GoogleApiClient connection suspended");
     }
+
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         Log.i("JJ", "GoogleApiClient connection failed: " + result.toString());

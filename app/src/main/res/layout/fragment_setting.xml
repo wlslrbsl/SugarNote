@@ -2,48 +2,118 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.isens.sugarnote.SettingFragment"
     android:orientation="vertical"
-    android:gravity="center">
+    android:paddingTop="50dp"
+    tools:context="com.isens.sugarnote.SettingFragment">
 
-    <Button
-        android:layout_margin="10dp"
-        android:id="@+id/btn_google"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="구글"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6"
+        android:orientation="vertical">
 
-    <Button
-        android:layout_margin="10dp"
-        android:id="@+id/btn_wifi"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="WIfi"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center">
 
-    <Button
-        android:layout_margin="10dp"
-        android:id="@+id/btn_alarm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="알람"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="밝기"
+                android:textSize="20dp"
+                android:textStyle="bold" />
 
-    <Button
-        android:layout_margin="10dp"
-        android:id="@+id/btn_device"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="기기"/>
+        </LinearLayout>
 
-    <Button
-        android:layout_margin="10dp"
-        android:id="@+id/btn_help"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="도움말"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-    <TextView
-        android:id="@+id/tv_google_log"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+            <SeekBar
+                android:id="@+id/seekbar_bright"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray">
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="소리"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <SeekBar
+                android:id="@+id/seekbar_sound"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray">
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="진동"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <SeekBar
+                android:id="@+id/seekbar_vibrate"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

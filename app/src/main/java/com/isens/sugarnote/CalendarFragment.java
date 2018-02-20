@@ -2,6 +2,7 @@ package com.isens.sugarnote;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -98,7 +99,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         btn_calendar_pre.setOnClickListener(this);
 
         btn_navi_center.setBackgroundResource(R.drawable.state_btn_navi_home);
-        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_leftarrow);
+        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_alarm);
         btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_calendar);
         btn_navi_left.setEnabled(true);
         btn_navi_right.setEnabled(true);
@@ -188,7 +189,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                     calenderView();
                     set_recycler();
                 } else {
-                    Toast.makeText(ac, "미구현", Toast.LENGTH_SHORT).show();
+                    listener.setFrag("ALARM");
                 }
                 break;
 
@@ -223,7 +224,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onDrawerClosed(View drawerView) {
         btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_calendar);
-        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_leftarrow);
+        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_alarm);
         whatYear = selYear;
         whatMonth = selMonth;
         whatDate = selDate;

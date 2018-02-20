@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -58,6 +59,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
 
     private Dialog dialog_logout, dialog_createDB, dialog_deleteLOG, dialog_Sync;
 
+    private WifiManager wifi;
     private FragmentInterActionListener listener;
 
     private LinearLayout btn_setting, btn_calendar, btn_measure, btn_report, btn_new;
@@ -66,7 +68,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
     private TextView tv_dialog, btn_dialog_ok, btn_dialog_cancel;
 
     private String userAccount;
-    private int userCount;
 
     private DBHelper dbHelper, dbHelper2;
     private SQLiteDatabase db, db2;
@@ -130,7 +131,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         btn_setting.setOnClickListener(this);
         btn_calendar.setOnClickListener(this);
 
-        //MyApplication.getmGoogleApiClient().connect();
+        wifi = (WifiManager) ac.getApplicationContext().getSystemService(ac.WIFI_SERVICE);
 
         // Inflate the layout for this fragment
         return view;
@@ -183,22 +184,33 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 break;
 
             case R.id.btn_navi_right:
-                syncFlag = true;
-                dialog_Sync = new Dialog(ac);
-                dialog_Sync.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog_Sync.setContentView(R.layout.dialog_default);
 
-                tv_dialog = (TextView) dialog_Sync.findViewById(R.id.tv_dialog);
-                tv_dialog.setText("구글 드라이브 데이터 동기화를\n진행하시겠습니까?");
+                if(wifi.isWifiEnabled()) {
+                    syncFlag = true;
+                    dialog_Sync = new Dialog(ac);
+                    dialog_Sync.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog_Sync.setContentView(R.layout.dialog_default);
 
-                btn_dialog_ok = (TextView) dialog_Sync.findViewById(R.id.btn_dialog_ok);
-                btn_dialog_cancel = (TextView) dialog_Sync.findViewById(R.id.btn_dialog_cancel);
-                btn_dialog_cancel.setText("아니요");
+                    tv_dialog = (TextView) dialog_Sync.findViewById(R.id.tv_dialog);
+                    tv_dialog.setText("구글 드라이브 데이터 동기화를\n진행하시겠습니까?");
 
-                btn_dialog_ok.setOnClickListener(this);
-                btn_dialog_cancel.setOnClickListener(this);
+                    btn_dialog_ok = (TextView) dialog_Sync.findViewById(R.id.btn_dialog_ok);
+                    btn_dialog_cancel = (TextView) dialog_Sync.findViewById(R.id.btn_dialog_cancel);
+                    btn_dialog_cancel.setText("아니요");
 
-                dialog_Sync.show();
+                    btn_dialog_ok.setOnClickListener(this);
+                    btn_dialog_cancel.setOnClickListener(this);
+
+                    dialog_Sync.show();
+
+                } else {
+
+                    WifiDialog dialog = new WifiDialog(ac);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.dialog_wifi);
+                    dialog.show();
+
+                }
 
                 break;
 

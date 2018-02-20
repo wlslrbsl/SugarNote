@@ -65,7 +65,6 @@ public class WifiDialog extends Dialog implements View.OnClickListener {
         btn_wifi_scan.setOnClickListener(this);
         btn_wifi_back.setOnClickListener(this);
 
-
         mContext = getContext();
 
         wifi = (WifiManager) mContext.getApplicationContext().getSystemService(mContext.WIFI_SERVICE);

@@ -52,7 +52,6 @@ public class AlarmAdapter extends BaseAdapter {
         /* 'listview_alarm'에 정의된 위젯에 대한 참조 획득 */
         final ImageView iv_img = (ImageView) convertView.findViewById(R.id.iv_img) ;
 
-
         TextView tv_ampm_alarm = (TextView) convertView.findViewById(R.id.tv_ampm_alarm) ;
         TextView tv_hour_alarm = (TextView) convertView.findViewById(R.id.tv_hour_alarm) ;
         TextView tv_min_alarm = (TextView) convertView.findViewById(R.id.tv_min_alarm) ;
@@ -66,7 +65,6 @@ public class AlarmAdapter extends BaseAdapter {
         tv_day[4] = (TextView) convertView.findViewById(R.id.tv_thu);
         tv_day[5] = (TextView) convertView.findViewById(R.id.tv_fri);
         tv_day[6] = (TextView) convertView.findViewById(R.id.tv_sat);
-
 
 
         Button btn_alarm_del = (Button) convertView.findViewById(R.id.btn_alarm_del);

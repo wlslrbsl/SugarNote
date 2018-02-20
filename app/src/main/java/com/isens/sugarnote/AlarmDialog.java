@@ -1,19 +1,19 @@
 package com.isens.sugarnote;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.Dialog;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.DialogFragment;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -22,35 +22,40 @@ import android.widget.ToggleButton;
  * Created by BSPL on 2017-07-17.
  */
 
-public class AlarmDialog extends DialogFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class AlarmDialog extends Dialog implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, TimePicker.OnTimeChangedListener {
 
-    private Button btn_alarm_save, btn_alarm_cancel;
+    private TextView  tv_alarm_monitor;
     private ToggleButton tgb_sun, tgb_mon, tgb_tue, tgb_wed, tgb_thu, tgb_fri, tgb_sat;
     private TimePicker tp_alarm;
     private boolean[] dayFlag = new boolean[7];
+    private String[] day = {"일", "월", "화", "수", "목", "금", "토"};
     private Context mContext;
     private AlarmManager alarmManager;
+    private int setHour, setMin;
 
-    private NotificationManager notificationManager;
+    public AlarmDialog(@NonNull Context context) {
+        super(context);
+    }
 
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        Dialog dialog = new Dialog(getActivity());
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_alarm);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.dialog_alarm);
 
-        tp_alarm = (TimePicker) dialog.findViewById(R.id.tp_alarm);
+        tp_alarm = (TimePicker) findViewById(R.id.tp_alarm);
+        tp_alarm.setOnTimeChangedListener(this);
 
-        btn_alarm_cancel = (Button) dialog.findViewById(R.id.btn_alarm_cancel);
-        btn_alarm_save = (Button) dialog.findViewById(R.id.btn_alarm_save);
+        tv_alarm_monitor = (TextView) findViewById(R.id.tv_alarm_monitor);
 
-        tgb_sun = (ToggleButton) dialog.findViewById(R.id.tgb_sun);
-        tgb_mon = (ToggleButton) dialog.findViewById(R.id.tgb_mon);
-        tgb_tue = (ToggleButton) dialog.findViewById(R.id.tgb_tue);
-        tgb_wed = (ToggleButton) dialog.findViewById(R.id.tgb_wed);
-        tgb_thu = (ToggleButton) dialog.findViewById(R.id.tgb_thu);
-        tgb_fri = (ToggleButton) dialog.findViewById(R.id.tgb_fri);
-        tgb_sat = (ToggleButton) dialog.findViewById(R.id.tgb_sat);
+        tgb_sun = (ToggleButton) findViewById(R.id.tgb_sun);
+        tgb_mon = (ToggleButton) findViewById(R.id.tgb_mon);
+        tgb_tue = (ToggleButton) findViewById(R.id.tgb_tue);
+        tgb_wed = (ToggleButton) findViewById(R.id.tgb_wed);
+        tgb_thu = (ToggleButton) findViewById(R.id.tgb_thu);
+        tgb_fri = (ToggleButton) findViewById(R.id.tgb_fri);
+        tgb_sat = (ToggleButton) findViewById(R.id.tgb_sat);
 
         tgb_sun.setOnCheckedChangeListener(this);
         tgb_mon.setOnCheckedChangeListener(this);
@@ -60,15 +65,48 @@ public class AlarmDialog extends DialogFragment implements View.OnClickListener,
         tgb_fri.setOnCheckedChangeListener(this);
         tgb_sat.setOnCheckedChangeListener(this);
 
-        btn_alarm_cancel.setOnClickListener(this);
-        btn_alarm_save.setOnClickListener(this);
-
         mContext = this.getContext();
 
+        updateMonitor();
+
         alarmManager = (AlarmManager) mContext.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+    }
 
+    public void updateMonitor() {
+        String str = "매주 ";
+        int cnt = 0;
+        setHour = tp_alarm.getCurrentHour();
+        setMin = tp_alarm.getCurrentMinute();
 
-        return dialog;
+        for (int i = 0; i < 7; i++) {
+            if (dayFlag[i]) {
+                if (cnt != 0)
+                    str += ", ";
+                str += day[i];
+                cnt++;
+            }
+        }
+        if (cnt == 7) {
+            str = "매일" + setHour + ":" + setMin + " 에 알람이 울립니다";
+            tv_alarm_monitor.setText(str);
+        } else if (cnt == 0) {
+            str = "오늘 or 내일" + setHour + ":" + setMin + " 에 알람이 울립니다";
+            tv_alarm_monitor.setText(str);
+        } else {
+            tv_alarm_monitor.setText(str + "요일\n" + setHour + ":" + setMin + " 에 알람이 울립니다");
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+
+        }
+    }
+
+    public void setDialog(int hour, int min) {
+        tp_alarm.setCurrentHour(hour);
+        tp_alarm.setCurrentMinute(min);
     }
 
     @Override
@@ -83,6 +121,7 @@ public class AlarmDialog extends DialogFragment implements View.OnClickListener,
                     tgb_sun.setTextColor(Color.WHITE);
                     dayFlag[0] = false;
                 }
+                updateMonitor();
                 break;
 
             case R.id.tgb_mon:
@@ -93,6 +132,7 @@ public class AlarmDialog extends DialogFragment implements View.OnClickListener,
                     tgb_mon.setTextColor(Color.WHITE);
                     dayFlag[1] = false;
                 }
+                updateMonitor();
                 break;
 
             case R.id.tgb_tue:
@@ -103,6 +143,7 @@ public class AlarmDialog extends DialogFragment implements View.OnClickListener,
                     tgb_tue.setTextColor(Color.WHITE);
                     dayFlag[2] = false;
                 }
+                updateMonitor();
                 break;
 
             case R.id.tgb_wed:
@@ -113,6 +154,7 @@ public class AlarmDialog extends DialogFragment implements View.OnClickListener,
                     tgb_wed.setTextColor(Color.WHITE);
                     dayFlag[3] = false;
                 }
+                updateMonitor();
                 break;
 
             case R.id.tgb_thu:
@@ -123,6 +165,7 @@ public class AlarmDialog extends DialogFragment implements View.OnClickListener,
                     tgb_thu.setTextColor(Color.WHITE);
                     dayFlag[4] = false;
                 }
+                updateMonitor();
                 break;
 
             case R.id.tgb_fri:
@@ -133,6 +176,7 @@ public class AlarmDialog extends DialogFragment implements View.OnClickListener,
                     tgb_fri.setTextColor(Color.WHITE);
                     dayFlag[5] = false;
                 }
+                updateMonitor();
                 break;
 
             case R.id.tgb_sat:
@@ -143,69 +187,13 @@ public class AlarmDialog extends DialogFragment implements View.OnClickListener,
                     tgb_sat.setTextColor(Color.WHITE);
                     dayFlag[6] = false;
                 }
+                updateMonitor();
                 break;
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_alarm_cancel:
-                dismiss();
-                break;
-
-            case R.id.btn_alarm_save:
-                Integer setHour = tp_alarm.getCurrentHour();
-                Integer setMin = tp_alarm.getCurrentMinute();
-
-                int flag = 0;
-                for (int i=0; i<7; i++) {
-                    if (dayFlag[i] == true) {
-                        flag = 1;
-                    }
-                }
-
-                if(flag == 1) {
-
-                    String ampm = "";
-                    if (setHour >= 12) {
-                        ampm = "PM";
-                        setHour = setHour - 12;
-                    } else {
-                        ampm = "AM";
-                    }
-                    if (setHour < 10) {
-                        if (setMin < 10) {
-                            AlarmActivity.getAlarmAdapter().addItem(ampm, "0" + setHour.toString(), "0" + setMin.toString(), dayFlag);
-                        } else {
-                            AlarmActivity.getAlarmAdapter().addItem(ampm, "0" + setHour.toString(), setMin.toString(), dayFlag);
-                        }
-                    } else {
-                        if (setMin < 10) {
-                            AlarmActivity.getAlarmAdapter().addItem(ampm, setHour.toString(), "0" + setMin.toString(), dayFlag);
-                        } else {
-                            AlarmActivity.getAlarmAdapter().addItem(ampm, setHour.toString(), setMin.toString(), dayFlag);
-                        }
-                    }
-                    AlarmActivity.getList_alarm().setAdapter(AlarmActivity.getAlarmAdapter());
-                    Intent intent = new Intent(getContext(), AlarmActivity.class);
-                    startActivity(intent);
-
-                    dismiss();
-                    break;
-                }
-                else {
-                    Toast.makeText(getContext(), "요일을 선택하세요", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-        }
-    }
-
-
-
-    public void setDialog(int hour, int min) {
-        tp_alarm.setCurrentHour(hour);
-        tp_alarm.setCurrentMinute(min);
+    public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+        updateMonitor();
     }
 }
