@@ -1,11 +1,17 @@
 package com.isens.sugarnote;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.os.PowerManager;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -14,7 +20,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 
 import com.google.android.gms.common.ConnectionResult;
@@ -49,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private UserGoalFragment userGoalFragment;
     private AlarmFragment alarmFragment;
 
+    private Time time;
+
     private FragmentManager fm;
     private FragmentTransaction tran;
 
@@ -74,13 +84,13 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         getSupportActionBar().hide();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
 
         homeFragment = new HomeFragment();
@@ -93,16 +103,33 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         userGoalFragment = new UserGoalFragment();
         alarmFragment = new AlarmFragment();
 
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+        intentFilter.addAction(Intent.ACTION_TIME_TICK);
+        intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+
+        registerReceiver(timeChangedReceiver, intentFilter);
+
         try {
             kakaoLink = KakaoLink.getKakaoLink(MainActivity.this);
         } catch (KakaoParameterException e) {
             e.printStackTrace();
         }
 
+        time = new Time();
+
         String keynum = getKeyHash(this);
 
         setFrag("HOME");
     }
+
+    private final BroadcastReceiver timeChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            /*Intent intent_alarm = new Intent(MainActivity.this, TestActivity.class);
+            startActivity(intent_alarm);*/
+        }
+    };
 
     @Override
     public void setFrag(String state) {
@@ -174,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                 tran.replace(R.id.fragment_container_main, userGoalFragment);
                 tran.commit();
                 break;
-            case "ALARM" :
+            case "ALARM":
                 tran.replace(R.id.fragment_container_main, alarmFragment);
                 tran.commit();
             default:

@@ -66,7 +66,6 @@ public class AlarmAdapter extends BaseAdapter {
         tv_day[5] = (TextView) convertView.findViewById(R.id.tv_fri);
         tv_day[6] = (TextView) convertView.findViewById(R.id.tv_sat);
 
-
         Button btn_alarm_del = (Button) convertView.findViewById(R.id.btn_alarm_del);
 
         /* 각 리스트에 뿌려줄 아이템을 받아오는데 mMyItem 재활용 */
@@ -115,6 +114,10 @@ public class AlarmAdapter extends BaseAdapter {
         });
 
         return convertView;
+    }
+
+    public void addItem(AlarmItem item) {
+        mItems.add(item);
     }
 
     /* 아이템 데이터 추가를 위한 함수. 자신이 원하는대로 작성 */

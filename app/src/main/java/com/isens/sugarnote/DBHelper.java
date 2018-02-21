@@ -32,11 +32,11 @@ public class DBHelper extends SQLiteOpenHelper {
         // 새로운 테이블 생성
         /* 이름은 MONEYBOOK이고, 자동으로 값이 증가하는 _id 정수형 기본키 컬럼과
         item 문자열 컬럼, price 정수형 컬럼, create_at 문자열 컬럼으로 구성된 테이블을 생성. */
-        db.execSQL("create table  " +           CARS_TABLE_NAME+
-                "(_id integer primary key AUTOINCREMENT NOT NULL,"+
-                CARS_COLUMN_DATE+                " Text,"+
-                CARS_COLUMN_GLSVAL+              " INTEGER,"+
-                CARS_COLUMN_MEAL+                " Text)"
+        db.execSQL("create table  " + CARS_TABLE_NAME +
+                "(_id integer primary key AUTOINCREMENT NOT NULL," +
+                CARS_COLUMN_DATE + " Text," +
+                CARS_COLUMN_GLSVAL + " INTEGER," +
+                CARS_COLUMN_MEAL + " Text)"
         );
 
 
@@ -45,7 +45,7 @@ public class DBHelper extends SQLiteOpenHelper {
     // DB 업그레이드를 위해 버전이 변경될 때 호출되는 함수
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS "+ DATABASE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME);
         onCreate(db);
     }
 
