@@ -82,7 +82,7 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
         alarm_cnt = list_alarm.getAdapter().getCount();
 
         if (alarm_cnt > 0) {
-            Alarm_Setting();
+            //Alarm_Setting();
         }
 
     }
@@ -145,7 +145,7 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
-    public void Alarm_Setting() {
+    /*public void Alarm_Setting() {
 
         last_alarmmills = Long.MAX_VALUE;
 
@@ -244,6 +244,6 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
         } else
             Toast.makeText(this, "알람설정없음", Toast.LENGTH_SHORT).show();
 
-    }
+    }*/
 
 }

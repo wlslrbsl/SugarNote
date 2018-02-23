@@ -11,30 +11,23 @@ import android.widget.TextView;
 
 public class AlarmItem {
 
-    private boolean enableFlag = true;
-    private Drawable icon;
+    private int enableFlag, alarm_num;
     private String hour, minute, ampm;
-    private boolean[] dayFlag = new boolean[7];
+    private int[] dayFlag = new int[7];
 
-    public void setEnableFlag(boolean enableFlag) {
+    public AlarmItem() {
+        enableFlag = 0;
+        hour = "";
+        minute = "";
+        ampm = "";
+    }
+
+    public void setEnableFlag(int enableFlag) {
         this.enableFlag = enableFlag;
     }
 
-    public boolean getEnableFlag() {
+    public int getEnableFlag() {
         return enableFlag;
-    }
-
-    public void setIcon(boolean flag, ImageView iv_img, Drawable icon_on, Drawable icon_off) {
-        if(flag == true){
-            iv_img.setImageDrawable(icon_on);
-        }
-        else{
-            iv_img.setImageDrawable(icon_off);
-        }
-    }
-
-    public Drawable getIcon() {
-        return icon;
     }
 
     public String getHour() {
@@ -61,31 +54,31 @@ public class AlarmItem {
         this.ampm = ampm;
     }
 
-    public boolean[] getDayFlag() {
+    public int[] getDayFlag() {
         return dayFlag;
     }
 
-    public void setDayFlag(boolean[] dayFlag) {
+    public void setDayFlag(int[] dayFlag) {
         this.dayFlag = dayFlag;
     }
 
-    public void setTv_day(boolean[] dayFlag, TextView[] tv_day) {
+    public void setTv_day(int[] dayFlag, TextView[] tv_day) {
 
-        if(dayFlag[0] == true) {
+        if (dayFlag[0] == 1) {
             tv_day[0].setTextColor(Color.RED);
         } else {
             tv_day[0].setTextColor(Color.WHITE);
         }
 
         for (int i = 1; i < 6; i++) {
-            if(dayFlag[i] == true) {
+            if (dayFlag[i] == 1) {
                 tv_day[i].setTextColor(Color.BLACK);
             } else {
                 tv_day[i].setTextColor(Color.WHITE);
             }
         }
 
-        if(dayFlag[6] == true) {
+        if (dayFlag[6] == 1) {
             tv_day[6].setTextColor(Color.BLUE);
         } else {
             tv_day[6].setTextColor(Color.WHITE);
@@ -93,4 +86,11 @@ public class AlarmItem {
 
     }
 
+    public int getAlarm_num() {
+        return alarm_num;
+    }
+
+    public void setAlarm_num(int alarm_num) {
+        this.alarm_num = alarm_num;
+    }
 }

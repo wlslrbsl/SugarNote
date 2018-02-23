@@ -258,7 +258,6 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
                 break;
 
             default:
-                Toast.makeText(ac, "망", Toast.LENGTH_SHORT).show();
                 break;
         }
     }

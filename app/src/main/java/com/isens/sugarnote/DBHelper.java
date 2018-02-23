@@ -29,9 +29,6 @@ public class DBHelper extends SQLiteOpenHelper {
     // DB를 새로 생성할 때 호출되는 함수
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // 새로운 테이블 생성
-        /* 이름은 MONEYBOOK이고, 자동으로 값이 증가하는 _id 정수형 기본키 컬럼과
-        item 문자열 컬럼, price 정수형 컬럼, create_at 문자열 컬럼으로 구성된 테이블을 생성. */
         db.execSQL("create table  " + CARS_TABLE_NAME +
                 "(_id integer primary key AUTOINCREMENT NOT NULL," +
                 CARS_COLUMN_DATE + " Text," +
@@ -94,14 +91,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void clear_db() {
         SQLiteDatabase db = getWritableDatabase();
-        // 입력한 항목과 일치하는 행의 가격 정보 수정
         db.execSQL("delete from GLUCOSEDATA");
         db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = 'GLUCOSEDATA'");
 
-
         db.close();
     }
-
-
 }
 
