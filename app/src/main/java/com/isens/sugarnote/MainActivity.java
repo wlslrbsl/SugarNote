@@ -1,7 +1,5 @@
 package com.isens.sugarnote;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,9 +8,6 @@ import android.content.IntentSender;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.PowerManager;
-import android.os.Vibrator;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.SharedPreferences;
@@ -20,16 +15,15 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Window;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.Toast;
-
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
-/*import com.google.android.gms.plus.Plus;*/
 import com.isens.module.bloodglucosemonitor.BgmBootLoader;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitor;
 import com.isens.module.bloodglucosemonitor.BloodGlucoseMonitorCallBack;
@@ -39,6 +33,8 @@ import com.kakao.util.KakaoParameterException;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
+import java.util.Date;
 
 import static com.kakao.util.helper.Utility.getPackageInfo;
 
@@ -46,6 +42,10 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
 
     private KakaoLink kakaoLink;
     private KakaoTalkLinkMessageBuilder kakaoTalkLinkMessageBuilder;
+
+    private SharedPreferences prefs_root;
+    private static SharedPreferences prefs_user;
+    private String userAccount;
 
     private HomeFragment homeFragment;
     private UserFragment userFragment;
@@ -90,8 +90,11 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
 
         getSupportActionBar().hide();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         setContentView(R.layout.activity_main);
+
+        prefs_root = getSharedPreferences("ROOT", 0);
+        userAccount = prefs_root.getString("SIGNIN", "none");
+        prefs_user = getSharedPreferences(userAccount, 0);
 
         homeFragment = new HomeFragment();
         userFragment = new UserFragment();
@@ -108,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
         intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
 
-        //registerReceiver(timeChangedReceiver, intentFilter);
+        registerReceiver(timeChangedReceiver, intentFilter);
 
         try {
             kakaoLink = KakaoLink.getKakaoLink(MainActivity.this);
@@ -126,10 +129,65 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private final BroadcastReceiver timeChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            /*Intent intent_alarm = new Intent(MainActivity.this, TestActivity.class);
-            startActivity(intent_alarm);*/
+
+            Calendar calendar = Calendar.getInstance();
+            long now = System.currentTimeMillis();
+            calendar.setTime(new Date(now));
+
+            int today = calendar.get(Calendar.DAY_OF_WEEK); // 1 : sunday
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int min = calendar.get(Calendar.MINUTE);
+
+            String str_hour, str_min;
+
+            if (min < 10) {
+                str_min = "0" + min;
+            } else {
+                str_min = String.valueOf(min);
+            }
+
+            if (hour >= 12) {
+                if (hour == 12) {
+                    str_hour = "PM12";
+                } else {
+                    if ((hour % 12) < 10) {
+                        str_hour = "PM0" + (hour % 12);
+                    } else {
+                        str_hour = "PM" + (hour % 12);
+                    }
+                }
+            } else {
+                if (hour == 0) {
+                    str_hour = "AM12";
+                } else {
+                    if (hour < 10) {
+                        str_hour = "AM0" + hour;
+                    } else {
+                        str_hour = "AM" + hour;
+                    }
+                }
+            }
+
+            int alarm_cnt = prefs_user.getInt("ALARM#", 0);
+
+            for (int i = 0; i < alarm_cnt; i++) {
+
+                String str = prefs_user.getString("ALARM" + String.valueOf(i + 1), null);
+                if (str.charAt(13) == '1') {
+                    if (str.charAt(today + 5) == '1') {
+                        if (str.substring(4, 6).equals(str_min)) {
+                            if (str.substring(0, 4).equals(str_hour)) {
+                                Intent intent_alarm = new Intent(MainActivity.this, AlarmActivity.class);
+                                startActivity(intent_alarm);
+                            }
+                        }
+                    }
+                }
+            }
         }
     };
+
+
 
     @Override
     public void setFrag(String state) {

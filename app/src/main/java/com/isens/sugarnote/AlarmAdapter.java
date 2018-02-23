@@ -79,6 +79,7 @@ public class AlarmAdapter extends BaseAdapter {
         btn_alarm_del.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 prefs_root = context.getSharedPreferences("ROOT", 0);
                 userAccount = prefs_root.getString("SIGNIN", "none");
                 prefs_user = context.getSharedPreferences(userAccount, 0);
@@ -95,7 +96,7 @@ public class AlarmAdapter extends BaseAdapter {
 
                     } else {
                         char ch = (char) (prefs_user.getString("ALARM" + String.valueOf(i + 1), null).charAt(14) - 1);
-                        strings[i - 1] = prefs_user.getString("ALARM" + String.valueOf(i + 1), null).substring(0,14) + String.valueOf(ch);
+                        strings[i - 1] = prefs_user.getString("ALARM" + String.valueOf(i + 1), null).substring(0, 14) + String.valueOf(ch);
                     }
                 }
 
@@ -111,11 +112,23 @@ public class AlarmAdapter extends BaseAdapter {
         iv_img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                prefs_root = context.getSharedPreferences("ROOT", 0);
+                userAccount = prefs_root.getString("SIGNIN", "none");
+                prefs_user = context.getSharedPreferences(userAccount, 0);
+                editor_user = prefs_user.edit();
+
                 if (mItems.get(position).getEnableFlag() == 1) {
-                    mItems.get(position).setEnableFlag(0);
+                    String str = prefs_user.getString("ALARM" + String.valueOf(position + 1), null);
+                    str = str.substring(0, 13) + "0" + str.charAt(14);
+                    editor_user.putString("ALARM" + String.valueOf(position + 1), str);
+                    editor_user.commit();
                     AlarmFragment.setListView();
                 } else {
-                    mItems.get(position).setEnableFlag(1);
+                    String str = prefs_user.getString("ALARM" + String.valueOf(position + 1), null);
+                    str = str.substring(0, 13) + "1" + str.charAt(14);
+                    editor_user.putString("ALARM" + String.valueOf(position + 1), str);
+                    editor_user.commit();
                     AlarmFragment.setListView();
                 }
             }

@@ -45,7 +45,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private TextView tv_drawer_month, tv_drawer_year, tv_calendar_date;
 
     private Button btn_navi_center, btn_navi_right, btn_navi_left;
-    private LinearLayout btn_calendar_next, btn_calendar_pre;
+    private LinearLayout btn_calendar_next, btn_calendar_pre, ll_recycler_view;
 
     private FragmentInterActionListener listener;
     private Calendar calendar;
@@ -89,6 +89,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         btn_calendar_next = (LinearLayout) view.findViewById(R.id.btn_calendar_next);
         btn_calendar_pre = (LinearLayout) view.findViewById(R.id.btn_calendar_pre);
+        ll_recycler_view = (LinearLayout) view.findViewById(R.id.ll_recycler_view);
 
         gv_calendar.setOnItemClickListener(this);
 
@@ -175,8 +176,11 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             case R.id.btn_navi_right:
                 if (!drawer_layout.isDrawerOpen(Gravity.START)) {
                     drawer_layout.openDrawer(Gravity.START);
-                } else if (drawer_layout.isDrawerOpen(Gravity.START))
+                    ll_recycler_view.setVisibility(View.INVISIBLE);
+                } else if (drawer_layout.isDrawerOpen(Gravity.START)) {
                     drawer_layout.closeDrawer(Gravity.START);
+                    ll_recycler_view.setVisibility(View.VISIBLE);
+                }
                 break;
 
             case R.id.btn_navi_left:
@@ -269,7 +273,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     void set_recycler() {
-
         String querry = "SELECT * FROM GLUCOSEDATA WHERE create_at LIKE '%" + calendar_head + "%';";
         Log.d("querry", querry);
         cursor = db.rawQuery(querry, null);

@@ -56,9 +56,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".AlarmActivity" />
-
-        <activity android:name=".TestActivity"></activity>
+        <activity android:name=".AlarmActivity"></activity>
     </application>
 
 </manifest>
