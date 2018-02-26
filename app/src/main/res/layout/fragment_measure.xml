@@ -20,36 +20,56 @@
             android:padding="20dp"
             android:src="@drawable/insert" />
 
-        <LinearLayout
-            android:id="@+id/LL_measure_result"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/result_text"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="111"
-                android:textAlignment="center"
-                android:textColor="@color/color_dark_gray"
-                android:textSize="45dp"
-                android:textStyle="bold" />
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="mg/dL"
-                android:textColor="@color/color_dark_gray"
-                android:textSize="20dp"
-                android:textStyle="bold" />
+                <ProgressBar
+                    android:id="@+id/Progressbar_result"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/circular_result"
+                    android:secondaryProgress="0"
+                    android:visibility="invisible"/>
 
-        </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/LL_measure_result"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
+                    <TextView
+                        android:id="@+id/result_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="111"
+                        android:textAlignment="center"
+                        android:textColor="@color/color_dark_gray"
+                        android:textSize="45dp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="mg/dL"
+                        android:textColor="@color/color_dark_gray"
+                        android:textSize="20dp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+        </FrameLayout>
     </FrameLayout>
 
     <LinearLayout

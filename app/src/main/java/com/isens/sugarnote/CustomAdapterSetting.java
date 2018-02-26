@@ -1,5 +1,6 @@
 package com.isens.sugarnote;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -19,6 +20,12 @@ public class CustomAdapterSetting extends BaseAdapter {
 
     private ImageView iv_img;
     private TextView tv_name;
+
+    private Activity activity;
+
+    CustomAdapterSetting(Activity activity){
+        this.activity = activity;
+    }
 
     @Override
     public int getCount() {
@@ -40,25 +47,33 @@ public class CustomAdapterSetting extends BaseAdapter {
         Context context = parent.getContext();
 
         if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.recyclerview_custom, parent, false);
+            LayoutInflater inflater = (LayoutInflater) activity.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.listview_power, parent, false);
         }
 
-        iv_img = (ImageView) convertView.findViewById(R.id.iv_img);
-        //tv_name = (TextView) convertView.findViewById(R.id.tv_name);
-
+        iv_img = (ImageView) convertView.findViewById(R.id.img_title);
+        tv_name = (TextView) convertView.findViewById(R.id.txt_title);
+        iv_img.setVisibility(View.VISIBLE);
         settingItem = getItem(position);
 
-        iv_img.setImageDrawable(settingItem.getIcon());
+        if("전원 끄기".equals(settingItem.getName()))
+            iv_img.setImageResource(R.drawable.img_power);
+        else if("재부팅".equals(settingItem.getName()))
+            iv_img.setImageResource(R.drawable.icon_alarm_set);
+        else if("로그아웃".equals(settingItem.getName()))
+            iv_img.setImageResource(R.drawable.img_power);
+
+
+
+
         tv_name.setText(settingItem.getName());
 
         return convertView;
     }
 
-    public void addItem(Drawable img, String name) {
+    public void addItem(String name) {
         CustomAdapterSettingItem item = new CustomAdapterSettingItem();
 
-        item.setIcon(img);
         item.setName(name);
 
         mItem.add(item);

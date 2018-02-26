@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,6 +43,8 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
     private View view;
 
     private FragmentInterActionListener listener;
+    private SharedPreferences.Editor editor;
+    private SharedPreferences prefs;
 
     private ImageView iv_meaure_status;
     private LinearLayout LL_measure_result, LL_mealoption;
@@ -50,7 +53,7 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
     private TextView tv_measure_info, tv_timer, result_txt, tv_measure_error, premeal_btn, postmeal_btn, nomeal_btn, tv_dialog, btn_dialog_ok, btn_dialog_cancel;
     private Button btn_navi_right, btn_navi_center, btn_navi_left;
 
-    private ProgressBar _progress_bar;
+    private ProgressBar _progress_bar, progressbar_result;
     private Intent pre_intent;
 
     private Dialog dialog_no_save, dialog_restart;
@@ -67,6 +70,11 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
 
     private int _bgm_value = 0;
     private int _bgm_status = 0;
+    private int cnt =0;
+    private int ll_max_premeal, ll_min_premeal, ll_max_postmeal, ll_min_postmeal, ll_max_nomeal, ll_min_nomeal;
+    private Handler handler = new Handler(); // Thread 에서 화면에 그리기 위해서 필요
+    private final int premeal = 1, postmeal = 2, nomeal = 3;
+    private boolean target_accept;
 
     public MeasureFragment() {
         // Required empty public constructor
@@ -109,7 +117,12 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
         ac = getActivity();
         view = inflater.inflate(R.layout.fragment_measure, container, false);
 
+        prefs = ac.getSharedPreferences("PrefName", 0);
+        editor = prefs.edit();
+
+
         _progress_bar = (ProgressBar) view.findViewById(R.id.circle_progress);
+        progressbar_result = (ProgressBar) view.findViewById(R.id.Progressbar_result);
 
         FL_measuring = (FrameLayout) view.findViewById(R.id.FL_measuring);
         LL_measure_result = (LinearLayout) view.findViewById(R.id.LL_measure_result);
@@ -167,18 +180,21 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
                 meal_option = "식전";
                 mealOptionReset();
                 premeal_btn.setTextColor(Color.BLUE);
+                set_result_progress(premeal);
                 break;
 
             case R.id.meas_postmeal_btn:
                 meal_option = "식후";
                 mealOptionReset();
                 postmeal_btn.setTextColor(Color.BLUE);
+                set_result_progress(postmeal);
                 break;
 
             case R.id.meas_nomeal_btn:
                 meal_option = "공복";
                 mealOptionReset();
                 nomeal_btn.setTextColor(Color.BLUE);
+                set_result_progress(nomeal);
                 break;
 
             case R.id.btn_navi_center:
@@ -410,6 +426,17 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
                 Log.v("jj", "측정완료" + Integer.toString(value) + "mg/dL");
 
                 _glucose_value = value;
+                meal_option = "식전";
+                /*목표치*/
+                ll_max_premeal = Integer.valueOf(prefs.getString("KEY_BEFORE_MAX", "100"));
+                ll_min_premeal = Integer.valueOf(prefs.getString("KEY_BEFORE_MIN", "80"));
+                ll_max_postmeal = Integer.valueOf(prefs.getString("KEY_AFTER_MAX", "120"));
+                ll_min_postmeal = Integer.valueOf(prefs.getString("KEY_AFTER_MIN", "100"));
+                ll_max_nomeal = Integer.valueOf(prefs.getString("KEY_EMPTY_MAX", "300"));
+                ll_min_nomeal = Integer.valueOf(prefs.getString("KEY_EMPTY_MIN", "90"));
+
+                set_result_progress(premeal);
+
 
                 break;
 
@@ -432,4 +459,69 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    private void set_result_progress(int meal){
+
+        progressbar_result.setSecondaryProgress(0);
+        progressbar_result.setProgress(0);
+        progressbar_result.setVisibility(View.VISIBLE);
+
+        switch (meal) {
+
+            case premeal:
+                if(_glucose_value >= ll_min_premeal && _glucose_value <= ll_max_premeal)
+                    target_accept = true;
+                else
+                    target_accept = false;
+
+                run_progress();
+                break;
+
+            case postmeal:
+                if(_glucose_value >= ll_min_postmeal && _glucose_value <= ll_max_postmeal)
+                    target_accept = true;
+                else
+                    target_accept = false;
+
+                run_progress();
+                break;
+
+            case nomeal:
+                if(_glucose_value >= ll_min_nomeal && _glucose_value <= ll_max_nomeal)
+                    target_accept = true;
+                else
+                    target_accept = false;
+
+                run_progress();
+                break;
+        }
+
+    }
+
+    private void run_progress(){
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() { // Thread 로 작업할 내용을 구현
+                cnt = 0;
+                while(cnt <= 100) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() { // 화면에 변경하는 작업을 구현
+                            if (target_accept == true) {
+                                progressbar_result.incrementProgressBy(2);
+                            }
+                            else{
+                                progressbar_result.incrementSecondaryProgressBy(2);
+                            }
+                            cnt = cnt + 1;
+                        }
+                    });
+                    try {
+                        Thread.sleep(8); // 시간지연
+                    } catch (InterruptedException e) {    }
+                } // end of while
+            }
+        });
+
+        t.start(); // 쓰레드 시작
+    }
 }

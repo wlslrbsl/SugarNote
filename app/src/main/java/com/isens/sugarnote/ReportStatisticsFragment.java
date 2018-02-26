@@ -51,6 +51,7 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
     private TextView txt_premeal_progress,txt_postmeal_progress,txt_nomeal_progress;
     private TextView txt_premeal_mean, txt_postmeal_mean, txt_nomeal_mean;
     private TextView txt_mean_count, txt_premeal_count, txt_postmeal_count, txt_nomeal_count;
+    private TextView tv_header;
     private int during_option = 1;
     private View view;
     private Activity ac;
@@ -108,7 +109,7 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
         btn_navi_left = (Button) ac.findViewById(R.id.btn_navi_left);
 
         btn_navi_center.setBackgroundResource(R.drawable.state_btn_navi_home);
-        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_week);
+        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_month);
         btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_graph);
 
         btn_navi_center.setOnClickListener(this);
@@ -131,6 +132,9 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
         txt_premeal_progress = (TextView) view.findViewById(R.id.txt_premeal_progressbar);
         txt_postmeal_progress = (TextView) view.findViewById(R.id.txt_postmeal_progressbar);
         txt_nomeal_progress = (TextView) view.findViewById(R.id.txt_nomeal_progressbar);
+
+        tv_header = (TextView) view.findViewById(R.id.tv_statistic_header);
+        tv_header.setText("주간 통계");
     }
 
     public void Load_Pref() {
@@ -255,15 +259,15 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
                     during_option = During_1month;
                     set_Data(During_1month);
                     set_View();
-                    btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_month);
-                    Toast.makeText(ac, "1달", Toast.LENGTH_SHORT).show();
+                    btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_week);
+                    tv_header.setText("월간 통계");
                 }
                 else{
                     during_option = During_1week;
                     set_Data(During_1week);
                     set_View();
-                    btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_week);
-                    Toast.makeText(ac, "1주", Toast.LENGTH_SHORT).show();
+                    btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_month);
+                    tv_header.setText("주간 통계");
                 }
 
                 break;

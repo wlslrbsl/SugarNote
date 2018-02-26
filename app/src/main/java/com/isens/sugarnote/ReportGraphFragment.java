@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -26,6 +27,8 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
+
+import org.w3c.dom.Text;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -55,6 +58,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
     private SharedPreferences.Editor editor;
     private SharedPreferences prefs;
 
+    private TextView tv_header;
     private final String premeal = "식전", postmeal = "식후", nomeal = "공복";
     private String meal_option = "";
     private ArrayList<Entry> glucose_premeal, glucose_postmeal, glucose_nomeal;
@@ -67,7 +71,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
     private String firstdata_date, lastdata_date, firstdate_premeal, lastdate_premeal, firstdate_postmeal, lastdate_postmeal, firstdate_nomeal, lastdate_nomeal = null;
     private long reference_timestamp = 0, last_idx = 0, last_idx_premeal = 0, last_idx_postmeal = 0, last_idx_nomeal = 0;
     private int x_Axix_option = 1, during_week = 1, during_month = 2;
-    int max_yVal, min_yVal, max_yVal_premeal, min_yVal_premeal, max_yVal_postmeal, min_yVal_postmeal, max_yVal_nomeal, min_yVal_nomeal;
+    int max_yVal_premeal, min_yVal_premeal, max_yVal_postmeal, min_yVal_postmeal, max_yVal_nomeal, min_yVal_nomeal;
     private int mealoption = 1;
 
     public ReportGraphFragment() {
@@ -93,6 +97,8 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         btn_navi_center = (Button) ac.findViewById(R.id.btn_navi_center);
         btn_navi_right = (Button) ac.findViewById(R.id.btn_navi_right);
         btn_navi_left = (Button) ac.findViewById(R.id.btn_navi_left);
+        tv_header = (TextView) view.findViewById(R.id.tv_graph_header);
+        tv_header.setText("식전 혈당값");
 
         btn_navi_center.setBackgroundResource(R.drawable.state_btn_navi_home);
         btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_premeal);
@@ -107,185 +113,214 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
         db = dbHelper.getWritableDatabase();
 
-        if (isExistdata() == true) {
-            get_max_min();
-            get_firstdatatime();
-            meal_option = premeal;
-            glucose_premeal = get_Dataset(premeal);
+        x_Axix_option = during_week;
+        if (isExistdata(postmeal) == true) {
+            get_max_min(postmeal);
+            get_firstdatatime(postmeal);
+            meal_option = postmeal;
             glucose_postmeal = get_Dataset(postmeal);
+            set_XAxis();
+            set_linedata(postmeal);
+            show_limitline();
+        }
+        if (isExistdata(nomeal) == true) {
+            get_max_min(nomeal);
+            get_firstdatatime(nomeal);
+            meal_option = nomeal;
             glucose_nomeal = get_Dataset(nomeal);
             set_XAxis();
-            set_linedata();
+            set_linedata(nomeal);
             show_limitline();
-        } else {
-            Toast.makeText(ac, "데이터 없음", Toast.LENGTH_SHORT).show();
+        }
+
+        if (isExistdata(premeal) == true) {
+            get_max_min(premeal);
+            get_firstdatatime(premeal);
+            meal_option = premeal;
+            glucose_premeal = get_Dataset(premeal);
+            set_XAxis();
+            set_linedata(premeal);
+            set_chart(premeal);
+            show_limitline();
+        }
+        else
+        {
+            meal_option = premeal;
+            mChart.clear();
         }
 
         return view;
     }
 
-    public boolean isExistdata() {
-        String query = "SELECT * FROM GLUCOSEDATA ORDER BY create_at ASC;";
-        Cursor c = db.rawQuery(query, null);
-        int size = c.getCount();
+    public boolean isExistdata(String meal) {
 
-        if (size == 0)
-            return false;
-        else
-            return true;
+        String query;
+        Cursor c;
+        int size;
+        boolean return_val = false;
+        switch(meal) {
+            case premeal:
+                query = "SELECT * FROM GLUCOSEDATA WHERE meal = '식전';";
+                c = db.rawQuery(query, null);
+                size = c.getCount();
+
+                if (size == 0)
+                    return_val = false;
+                else
+                    return_val = true;
+                break;
+
+            case postmeal:
+                query = "SELECT * FROM GLUCOSEDATA WHERE meal = '식후';";
+                c = db.rawQuery(query, null);
+                size = c.getCount();
+
+                if (size == 0)
+                    return_val = false;
+                else
+                    return_val = true;
+                break;
+
+            case nomeal:
+                query = "SELECT * FROM GLUCOSEDATA WHERE meal = '공복';";
+                c = db.rawQuery(query, null);
+                size = c.getCount();
+
+                if (size == 0)
+                    return_val = false;
+                else
+                    return_val = true;
+                break;
+        }
+        return return_val;
     }
 
-    public void get_firstdatatime() {
-        String query = "SELECT * FROM GLUCOSEDATA ORDER BY create_at ASC;";
-        Cursor c = db.rawQuery(query, null);
-        c.moveToFirst();
-        String date = c.getString(1);
+    public void get_firstdatatime(String meal) {
+        String query;
+        Cursor c;
+        String date;
         DateFormat simpleDateFormat = new SimpleDateFormat("yyyy/ MM/ dd");
 
-        date = date.substring(0, date.indexOf(","));
-        firstdata_date = date;
-        try {
-            Date time_stamp = simpleDateFormat.parse(firstdata_date);
+        switch (meal) {
 
-            long milliseconds = time_stamp.getTime();
+            case premeal:
+                query = "SELECT * FROM GLUCOSEDATA WHERE meal = '식전' ORDER BY create_at ASC;";
+                c = db.rawQuery(query, null);
+                c.moveToFirst();
+                date = c.getString(1);
 
-            reference_timestamp = milliseconds;
-            Log.i("JJ", "firstRef: " + time_stamp);
-            Log.i("JJ", "firstRef: " + reference_timestamp);
+                date = date.substring(0, date.indexOf(","));
+                firstdate_premeal = date;
+                try {
+                    Date time_stamp = simpleDateFormat.parse(firstdate_premeal);
 
-        } catch (Exception e1) {
-            e1.printStackTrace();
+                    long milliseconds = time_stamp.getTime();
+
+                    reference_timestamp = milliseconds;
+                    Log.i("JJ", "firstRef: " + time_stamp);
+                    Log.i("JJ", "firstRef: " + reference_timestamp);
+
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+
+                c.moveToLast();
+                date = c.getString(1);
+                date = date.substring(0, date.indexOf(","));
+                lastdate_premeal = date;
+                last_idx_premeal = 0;
+                try {
+                    Date time_stamp = simpleDateFormat.parse(lastdate_premeal);
+
+                    last_idx_premeal = (time_stamp.getTime() - reference_timestamp) / timestamp_const;
+
+                    Log.i("JJ", "lastRef: " + time_stamp);
+                    Log.i("JJ", "lastRef: " + last_idx_premeal);
+
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+                break;
+
+            case postmeal:
+                query = "SELECT * FROM GLUCOSEDATA WHERE meal = '식후' ORDER BY create_at ASC;";
+                c = db.rawQuery(query, null);
+                c.moveToFirst();
+                date = c.getString(1);
+
+                date = date.substring(0, date.indexOf(","));
+                firstdate_postmeal = date;
+                try {
+                    Date time_stamp = simpleDateFormat.parse(firstdate_postmeal);
+
+                    long milliseconds = time_stamp.getTime();
+
+                    reference_timestamp = milliseconds;
+                    Log.i("JJ", "firstRef: " + time_stamp);
+                    Log.i("JJ", "firstRef: " + reference_timestamp);
+
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+
+                c.moveToLast();
+                date = c.getString(1);
+                date = date.substring(0, date.indexOf(","));
+                lastdate_postmeal = date;
+                last_idx_postmeal = 0;
+                try {
+                    Date time_stamp = simpleDateFormat.parse(lastdate_postmeal);
+
+                    last_idx_postmeal = (time_stamp.getTime() - reference_timestamp) / timestamp_const;
+
+                    Log.i("JJ", "lastRef: " + time_stamp);
+                    Log.i("JJ", "lastRef: " + last_idx_postmeal);
+
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+
+            break;
+
+            case nomeal:
+                query = "SELECT * FROM GLUCOSEDATA WHERE meal = '공복' ORDER BY create_at ASC;";
+                c = db.rawQuery(query, null);
+                c.moveToFirst();
+                date = c.getString(1);
+
+                date = date.substring(0, date.indexOf(","));
+                firstdate_nomeal = date;
+                try {
+                    Date time_stamp = simpleDateFormat.parse(firstdate_nomeal);
+
+                    long milliseconds = time_stamp.getTime();
+
+                    reference_timestamp = milliseconds;
+                    Log.i("JJ", "firstRef: " + time_stamp);
+                    Log.i("JJ", "firstRef: " + reference_timestamp);
+
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+
+                c.moveToLast();
+                date = c.getString(1);
+                date = date.substring(0, date.indexOf(","));
+                lastdate_nomeal = date;
+                last_idx_nomeal = 0;
+                try {
+                    Date time_stamp = simpleDateFormat.parse(lastdate_nomeal);
+
+                    last_idx_nomeal = (time_stamp.getTime() - reference_timestamp) / timestamp_const;
+
+                    Log.i("JJ", "lastRef: " + time_stamp);
+                    Log.i("JJ", "lastRef: " + last_idx_nomeal);
+
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            break;
         }
-
-        c.moveToLast();
-        date = c.getString(1);
-        date = date.substring(0, date.indexOf(","));
-        lastdata_date = date;
-        last_idx = 0;
-        try {
-            Date time_stamp = simpleDateFormat.parse(lastdata_date);
-
-            last_idx = (time_stamp.getTime() - reference_timestamp) / timestamp_const;
-
-            Log.i("JJ", "lastRef: " + time_stamp);
-            Log.i("JJ", "lastRef: " + last_idx);
-
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-
-        query = "SELECT * FROM GLUCOSEDATA WHERE meal = '식전' ORDER BY create_at ASC;";
-        c = db.rawQuery(query, null);
-        c.moveToFirst();
-        date = c.getString(1);
-
-        date = date.substring(0, date.indexOf(","));
-        firstdate_premeal = date;
-        try {
-            Date time_stamp = simpleDateFormat.parse(firstdate_premeal);
-
-            long milliseconds = time_stamp.getTime();
-
-            reference_timestamp = milliseconds;
-            Log.i("JJ", "firstRef: " + time_stamp);
-            Log.i("JJ", "firstRef: " + reference_timestamp);
-
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-        c.moveToLast();
-        date = c.getString(1);
-        date = date.substring(0, date.indexOf(","));
-        lastdate_premeal = date;
-        last_idx_premeal = 0;
-        try {
-            Date time_stamp = simpleDateFormat.parse(lastdate_premeal);
-
-            last_idx_premeal = (time_stamp.getTime() - reference_timestamp) / timestamp_const;
-
-            Log.i("JJ", "lastRef: " + time_stamp);
-            Log.i("JJ", "lastRef: " + last_idx_premeal);
-
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-        query = "SELECT * FROM GLUCOSEDATA WHERE meal = '식후' ORDER BY create_at ASC;";
-        c = db.rawQuery(query, null);
-        c.moveToFirst();
-        date = c.getString(1);
-
-        date = date.substring(0, date.indexOf(","));
-        firstdate_postmeal = date;
-        try {
-            Date time_stamp = simpleDateFormat.parse(firstdate_postmeal);
-
-            long milliseconds = time_stamp.getTime();
-
-            reference_timestamp = milliseconds;
-            Log.i("JJ", "firstRef: " + time_stamp);
-            Log.i("JJ", "firstRef: " + reference_timestamp);
-
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-        c.moveToLast();
-        date = c.getString(1);
-        date = date.substring(0, date.indexOf(","));
-        lastdate_postmeal = date;
-        last_idx_postmeal = 0;
-        try {
-            Date time_stamp = simpleDateFormat.parse(lastdate_postmeal);
-
-            last_idx_postmeal = (time_stamp.getTime() - reference_timestamp) / timestamp_const;
-
-            Log.i("JJ", "lastRef: " + time_stamp);
-            Log.i("JJ", "lastRef: " + last_idx_postmeal);
-
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-        query = "SELECT * FROM GLUCOSEDATA WHERE meal = '공복' ORDER BY create_at ASC;";
-        c = db.rawQuery(query, null);
-        c.moveToFirst();
-        date = c.getString(1);
-
-        date = date.substring(0, date.indexOf(","));
-        firstdate_nomeal = date;
-        try {
-            Date time_stamp = simpleDateFormat.parse(firstdate_nomeal);
-
-            long milliseconds = time_stamp.getTime();
-
-            reference_timestamp = milliseconds;
-            Log.i("JJ", "firstRef: " + time_stamp);
-            Log.i("JJ", "firstRef: " + reference_timestamp);
-
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-        c.moveToLast();
-        date = c.getString(1);
-        date = date.substring(0, date.indexOf(","));
-        lastdate_nomeal = date;
-        last_idx_nomeal = 0;
-        try {
-            Date time_stamp = simpleDateFormat.parse(lastdate_nomeal);
-
-            last_idx_nomeal = (time_stamp.getTime() - reference_timestamp) / timestamp_const;
-
-            Log.i("JJ", "lastRef: " + time_stamp);
-            Log.i("JJ", "lastRef: " + last_idx_nomeal);
-
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
 
     }
 
@@ -431,6 +466,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
                 if(x_Axix_option == during_week) {
                     x_Axix_option = during_month;
                     mChart.setVisibleXRangeMinimum(30f);
+                    mChart.setVisibleXRangeMaximum(30f);
                     mChart.moveViewToX(end);
                     mChart.invalidate();
                     Toast.makeText(ac, "1달", Toast.LENGTH_SHORT).show();
@@ -438,6 +474,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
                 else{
                     x_Axix_option = during_week;
                     mChart.setVisibleXRangeMinimum(7f);
+                    mChart.setVisibleXRangeMaximum(7f);
                     mChart.moveViewToX(end);
                     mChart.invalidate();
                     Toast.makeText(ac, "1주", Toast.LENGTH_SHORT).show();
@@ -477,67 +514,79 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
 
     }
 
-    public void set_linedata() {
+    public void set_linedata(String meal) {
 
         lineDataSets = new ArrayList<>();
 
-        lineDataSet1 = new LineDataSet(glucose_premeal, "식전");
-        lineDataSet1.setColor(Color.parseColor("#FF002060"));
-        lineDataSet1.setLineWidth(2);
-        lineDataSet1.setDrawValues(false);
-        lineDataSet1.setCircleRadius(5);
-        lineDataSet1.setCircleColorHole(Color.WHITE);
-        lineDataSet1.setDrawCircleHole(true);
-        lineDataSet1.setCircleColor(Color.parseColor("#FF002060"));
+        switch (meal) {
 
-        lineDataSet2 = new LineDataSet(glucose_postmeal, "식후");
-        lineDataSet2.setColor(Color.parseColor("#FF002060"));
-        lineDataSet2.setLineWidth(2);
-        lineDataSet2.setDrawValues(false);
-        lineDataSet2.setCircleRadius(5);
-        lineDataSet2.setCircleColorHole(Color.WHITE);
-        lineDataSet2.setDrawCircleHole(true);
-        lineDataSet2.setCircleColor(Color.parseColor("#FF002060"));
+            case premeal:
+                lineDataSet1 = new LineDataSet(glucose_premeal, "식전");
+                lineDataSet1.setColor(Color.parseColor("#FF002060"));
+                lineDataSet1.setLineWidth(2);
+                lineDataSet1.setDrawValues(false);
+                lineDataSet1.setCircleRadius(5);
+                lineDataSet1.setCircleColorHole(Color.WHITE);
+                lineDataSet1.setDrawCircleHole(true);
+                lineDataSet1.setCircleColor(Color.parseColor("#FF002060"));
+                lineDataSets.clear();
+                lineDataSets.add(lineDataSet1);
+                break;
 
-        lineDataSet3 = new LineDataSet(glucose_nomeal, "공복");
-        lineDataSet3.setColor(Color.parseColor("#FF002060"));
-        lineDataSet3.setLineWidth(2);
-        lineDataSet3.setDrawValues(false);
-        lineDataSet3.setCircleRadius(5);
-        lineDataSet3.setCircleColorHole(Color.WHITE);
-        lineDataSet3.setDrawCircleHole(true);
-        lineDataSet3.setCircleColor(Color.parseColor("#FF002060"));
+            case postmeal:
+                lineDataSet2 = new LineDataSet(glucose_postmeal, "식후");
+                lineDataSet2.setColor(Color.parseColor("#FF002060"));
+                lineDataSet2.setLineWidth(2);
+                lineDataSet2.setDrawValues(false);
+                lineDataSet2.setCircleRadius(5);
+                lineDataSet2.setCircleColorHole(Color.WHITE);
+                lineDataSet2.setDrawCircleHole(true);
+                lineDataSet2.setCircleColor(Color.parseColor("#FF002060"));
+                lineDataSets.clear();
+                lineDataSets.add(lineDataSet2);
+                break;
 
-        lineDataSets.add(lineDataSet1);
-        //lineDataSets.add(lineDataSet2);
-        //lineDataSets.add(lineDataSet3);
+            case nomeal:
+                lineDataSet3 = new LineDataSet(glucose_nomeal, "공복");
+                lineDataSet3.setColor(Color.parseColor("#FF002060"));
+                lineDataSet3.setLineWidth(2);
+                lineDataSet3.setDrawValues(false);
+                lineDataSet3.setCircleRadius(5);
+                lineDataSet3.setCircleColorHole(Color.WHITE);
+                lineDataSet3.setDrawCircleHole(true);
+                lineDataSet3.setCircleColor(Color.parseColor("#FF002060"));
+                lineDataSets.clear();
+                lineDataSets.add(lineDataSet3);
+            break;
+        }
+        //lineDataSets.add(lineDataSet1);
 
-        YAxis yAxisRight = mChart.getAxisRight();
-        yAxisRight.setEnabled(false);
-
-        mChart.setData(new LineData(xAXES, lineDataSets));
-        mChart.setDescription("");
-        mChart.setDrawGridBackground(false);
-        mChart.setDrawBorders(true);
-        mChart.getData().setHighlightEnabled(false);
-        mChart.getXAxis().setDrawGridLines(false);
-        mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        mChart.getXAxis().setTextSize(10);
-        mChart.getLegend().setEnabled(false);
-        mChart.setScaleYEnabled(false);
-        mChart.setScaleXEnabled(false);
-        mChart.setAutoScaleMinMaxEnabled(false);
-        mChart.getAxisLeft().setAxisMinValue(min_yVal_premeal);
-        mChart.getAxisLeft().setAxisMaxValue(max_yVal_premeal);
-        mChart.getAxisLeft().setTextSize(13);
-
-        if (x_Axix_option == during_week) // 확인요
-            mChart.setVisibleXRangeMaximum(7f);
-        else
-            mChart.setVisibleXRangeMaximum(30f);
-
-        mChart.moveViewToX(end);
-        mChart.invalidate();
+//        YAxis yAxisRight = mChart.getAxisRight();
+//        yAxisRight.setEnabled(false);
+//
+//        mChart.setData(new LineData(xAXES, lineDataSets));
+//        mChart.setDescription("");
+//        mChart.setDrawGridBackground(false);
+//        mChart.setDrawBorders(true);
+//        mChart.getData().setHighlightEnabled(false);
+//        mChart.getXAxis().setDrawGridLines(false);
+//        mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+//        mChart.getXAxis().setTextSize(10);
+//        mChart.getLegend().setEnabled(false);
+//        mChart.setScaleYEnabled(false);
+//        mChart.setScaleXEnabled(false);
+//        mChart.setAutoScaleMinMaxEnabled(false);
+//        mChart.getAxisLeft().setAxisMinValue(min_yVal_premeal);
+//        mChart.getAxisLeft().setAxisMaxValue(max_yVal_premeal);
+//        mChart.getAxisLeft().setTextSize(13);
+//
+//        if (x_Axix_option == during_week) // 확인요
+//            mChart.setVisibleXRangeMaximum(7f);
+//        else
+//            mChart.setVisibleXRangeMaximum(30f);
+//
+//        mChart.moveViewToX(end);
+//        mChart.invalidate();
     }
 
     public void show_limitline() {
@@ -619,49 +668,46 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    void get_max_min() {
-        String query = "SELECT MAX(glucose_val) FROM GLUCOSEDATA;";
-        Cursor c = db.rawQuery(query, null);
-        c.moveToFirst();
-        max_yVal = c.getInt(0) + 10;
+    void get_max_min(String meal) {
+        String query ="";
+        Cursor c;
+        switch (meal) {
+            case premeal:
+                query = "SELECT MIN(glucose_val) FROM GLUCOSEDATA WHERE meal = '식전';";
+                c = db.rawQuery(query, null);
+                c.moveToFirst();
+                min_yVal_premeal = c.getInt(0) - 10;
 
-        query = "SELECT MIN(glucose_val) FROM GLUCOSEDATA;";
-        c = db.rawQuery(query, null);
-        c.moveToFirst();
-        min_yVal = c.getInt(0) - 10;
-        Log.i("JJ", "Max :" + Integer.toString(max_yVal));
-        Log.i("JJ", "Min :" + Integer.toString(min_yVal));
+                query = "SELECT MAX(glucose_val) FROM GLUCOSEDATA WHERE meal = '식전';";
+                c = db.rawQuery(query, null);
+                c.moveToFirst();
+                max_yVal_premeal = c.getInt(0) + 10;
+                break;
 
-        query = "SELECT MIN(glucose_val) FROM GLUCOSEDATA WHERE meal = '식전';";
-        c = db.rawQuery(query, null);
-        c.moveToFirst();
-        min_yVal_premeal = c.getInt(0) - 10;
+            case postmeal:
+                query = "SELECT MIN(glucose_val) FROM GLUCOSEDATA WHERE meal = '식후';";
+                c = db.rawQuery(query, null);
+                c.moveToFirst();
+                min_yVal_postmeal = c.getInt(0) - 10;
 
-        query = "SELECT MAX(glucose_val) FROM GLUCOSEDATA WHERE meal = '식전';";
-        c = db.rawQuery(query, null);
-        c.moveToFirst();
-        max_yVal_premeal = c.getInt(0) + 10;
+                query = "SELECT MAX(glucose_val) FROM GLUCOSEDATA WHERE meal = '식후';";
+                c = db.rawQuery(query, null);
+                c.moveToFirst();
+                max_yVal_postmeal = c.getInt(0) + 10;
+                break;
 
-        query = "SELECT MIN(glucose_val) FROM GLUCOSEDATA WHERE meal = '식후';";
-        c = db.rawQuery(query, null);
-        c.moveToFirst();
-        min_yVal_postmeal = c.getInt(0) - 10;
+            case nomeal:
+                query = "SELECT MIN(glucose_val) FROM GLUCOSEDATA WHERE meal = '공복';";
+                c = db.rawQuery(query, null);
+                c.moveToFirst();
+                min_yVal_nomeal = c.getInt(0) - 10;
 
-        query = "SELECT MAX(glucose_val) FROM GLUCOSEDATA WHERE meal = '식후';";
-        c = db.rawQuery(query, null);
-        c.moveToFirst();
-        max_yVal_postmeal = c.getInt(0) + 10;
-
-        query = "SELECT MIN(glucose_val) FROM GLUCOSEDATA WHERE meal = '공복';";
-        c = db.rawQuery(query, null);
-        c.moveToFirst();
-        min_yVal_nomeal = c.getInt(0) - 10;
-
-        query = "SELECT MAX(glucose_val) FROM GLUCOSEDATA WHERE meal = '공복';";
-        c = db.rawQuery(query, null);
-        c.moveToFirst();
-        max_yVal_nomeal = c.getInt(0) + 10;
-
+                query = "SELECT MAX(glucose_val) FROM GLUCOSEDATA WHERE meal = '공복';";
+                c = db.rawQuery(query, null);
+                c.moveToFirst();
+                max_yVal_nomeal = c.getInt(0) + 10;
+                break;
+        }
     }
 
     @Override
@@ -679,45 +725,101 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
 
                 if(meal_option == premeal) {
                     meal_option = postmeal;
-                    set_XAxis();
-                    lineDataSets.remove(0);
-                    lineDataSets.add(lineDataSet2);
-                    mChart.setData(new LineData(xAXES, lineDataSets));
-                    mChart.getAxisLeft().setAxisMinValue(min_yVal_postmeal);
-                    mChart.getAxisLeft().setAxisMaxValue(max_yVal_postmeal);
-                    mChart.getData().setHighlightEnabled(false);
+                    mChart.clear();
+                    if(isExistdata(postmeal)) {
+                        set_XAxis();
+                        lineDataSets.clear();
+                        lineDataSets.add(lineDataSet2);
+                        set_chart(postmeal);
+                    }
+                    else
+                        mChart.clear();
 
+                    tv_header.setText("식후 혈당값");
                     btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_postmeal);
-                    Toast.makeText(ac, "식후", Toast.LENGTH_SHORT).show();
                 }
                 else if(meal_option == postmeal){
                     meal_option = nomeal;
-                    set_XAxis();
-                    lineDataSets.remove(0);
-                    lineDataSets.add(lineDataSet3);
-                    mChart.setData(new LineData(xAXES, lineDataSets));
-                    mChart.getAxisLeft().setAxisMinValue(min_yVal_nomeal);
-                    mChart.getAxisLeft().setAxisMaxValue(max_yVal_nomeal);
-                    mChart.getData().setHighlightEnabled(false);
+                    mChart.clear();
+                    if(isExistdata(nomeal)) {
+                        set_XAxis();
+                        lineDataSets.clear();
+                        lineDataSets.add(lineDataSet3);
+                        set_chart(nomeal);
+                    }
+                    else
+                        mChart.clear();
+
+                    tv_header.setText("공복 혈당값");
                     btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_nomeal);
-                    Toast.makeText(ac, "공복", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     meal_option = premeal;
-                    set_XAxis();
-                    lineDataSets.remove(0);
-                    lineDataSets.add(lineDataSet1);
-                    mChart.setData(new LineData(xAXES, lineDataSets));
-                    mChart.getAxisLeft().setAxisMinValue(min_yVal_premeal);
-                    mChart.getAxisLeft().setAxisMaxValue(max_yVal_premeal);
+                    mChart.clear();
+                    if(isExistdata(premeal)) {
+                        set_XAxis();
+                        lineDataSets.clear();
+                        lineDataSets.add(lineDataSet1);
+                        set_chart(premeal);
+                    }
+                    else
+                        mChart.clear();
+
+                    tv_header.setText("식전 혈당값");
                     btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_premeal);
-                    Toast.makeText(ac, "식전", Toast.LENGTH_SHORT).show();
                 }
 
                 show_limitline();
-                mChart.invalidate();
+                //mChart.invalidate();
 
                 break;
         }
+    }
+
+    private void set_chart(String meal){
+        YAxis yAxisRight = mChart.getAxisRight();
+        yAxisRight.setEnabled(false);
+        mChart.setData(new LineData(xAXES, lineDataSets));
+        mChart.setDescription("");
+        mChart.setDrawGridBackground(false);
+        mChart.setDrawBorders(true);
+        mChart.getData().setHighlightEnabled(false);
+        mChart.getXAxis().setDrawGridLines(false);
+        mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        mChart.getXAxis().setTextSize(10);
+        mChart.getLegend().setEnabled(false);
+        mChart.setScaleYEnabled(false);
+        mChart.setScaleXEnabled(false);
+        mChart.setAutoScaleMinMaxEnabled(false);
+        switch(meal){
+            case premeal:
+                mChart.getAxisLeft().setAxisMinValue(min_yVal_premeal);
+                mChart.getAxisLeft().setAxisMaxValue(max_yVal_premeal);
+                break;
+
+            case postmeal:
+                mChart.getAxisLeft().setAxisMinValue(min_yVal_postmeal);
+                mChart.getAxisLeft().setAxisMaxValue(max_yVal_postmeal);
+                break;
+
+            case nomeal:
+                mChart.getAxisLeft().setAxisMinValue(min_yVal_nomeal);
+                mChart.getAxisLeft().setAxisMaxValue(max_yVal_nomeal);
+                break;
+
+        }
+
+        mChart.getAxisLeft().setTextSize(13);
+
+        if(x_Axix_option == during_week) {
+            mChart.setVisibleXRangeMaximum(7f);
+            mChart.setVisibleXRangeMinimum(7f);
+        }
+        else{
+            mChart.setVisibleXRangeMaximum(30f);
+            mChart.setVisibleXRangeMinimum(30f);
+        }
+        mChart.moveViewToX(end);
+        //mChart.invalidate();
     }
 }

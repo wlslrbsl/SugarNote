@@ -95,6 +95,9 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
                 break;
 
             case R.id.btn_navi_right:
+                if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+                db = dbHelper.getWritableDatabase();
+                dbHelper.clear_db();
                 Toast.makeText(ac, "기기정보", Toast.LENGTH_SHORT).show();
                 break;
 

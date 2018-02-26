@@ -8,6 +8,8 @@
             <solid android:color="#FFA6A6A6"/>
         </shape>
     </item>
+
+
     <item android:id="@android:id/progress">
         <rotate
             android:fromDegrees="270"

@@ -3,7 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="30dp">
+    android:paddingTop="20dp">
+
+    <TextView
+        android:id="@+id/tv_statistic_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/color_dark_gray"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="주간 통계"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -237,7 +247,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="210dp"
+        android:layout_height="190dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:orientation="horizontal">
@@ -252,13 +262,13 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
+                android:layout_height="120dp"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="식전"
                     android:textColor="@color/color_dark_blue"
@@ -268,7 +278,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="평균 혈당"
                     android:textColor="@color/txt_gray"
@@ -302,7 +312,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="목표 달성률"
                     android:textColor="@color/txt_gray"
@@ -366,13 +376,13 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
+                android:layout_height="120dp"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="식후"
                     android:textColor="@color/color_blue"
@@ -382,7 +392,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="평균 혈당"
                     android:textColor="@color/txt_gray"
@@ -416,7 +426,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="목표 달성률"
                     android:textColor="@color/txt_gray"
@@ -480,13 +490,13 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
+                android:layout_height="120dp"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="공복"
                     android:textColor="@color/color_light_blue"
@@ -496,7 +506,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="평균 혈당"
                     android:textColor="@color/txt_gray"
@@ -530,7 +540,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="목표 달성률"
                     android:textColor="@color/txt_gray"

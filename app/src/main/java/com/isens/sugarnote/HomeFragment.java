@@ -8,17 +8,27 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.PowerManager;
+import android.os.RemoteException;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.drive.Drive;
@@ -43,13 +53,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
+import static com.github.mikephil.charting.charts.Chart.LOG_TAG;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener {
+public class HomeFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener, ListView.OnItemClickListener {
 
     private SharedPreferences prefs_root, prefs_user;
     private SharedPreferences.Editor editor_root, editor_user;
@@ -57,28 +71,36 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
     private Activity ac;
     private View view;
 
-    private Dialog dialog_logout, dialog_createDB, dialog_deleteLOG, dialog_Sync;
+    private CustomAdapterSetting listviewadapter_power;
+
+    private ListView listview;
+
+    private Dialog dialog_logout, dialog_createDB, dialog_deleteLOG, dialog_Sync, dialog_power;
 
     private WifiManager wifi;
     private FragmentInterActionListener listener;
-
+    private int progress_interval;
     private LinearLayout btn_setting, btn_calendar, btn_measure, btn_report, btn_new;
     private Button btn_navi_right, btn_navi_center, btn_navi_left;
-
+    private ProgressBar sync_progbar;
     private TextView tv_dialog, btn_dialog_ok, btn_dialog_cancel;
 
     private String userAccount;
 
     private DBHelper dbHelper, dbHelper2;
     private SQLiteDatabase db, db2;
-
+    private int progress_val = 0;
     private boolean download_complete = false;
     private boolean createDBFlag = false;
     private boolean deleteLogFlag = false;
     private boolean syncFlag = false;
+    private Handler handler = new Handler(); // Thread 에서 화면에 그리기 위해서 필요
 
     private String dbfilepath;
+    private static String dbfilepath2;
     public DriveId mDriveId;
+
+    private static Drive service;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -102,6 +124,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         userAccount = prefs_root.getString("SIGNIN", "none");
         prefs_user = ac.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
+
+        listviewadapter_power = new CustomAdapterSetting(ac);
+        listviewadapter_power.addItem("전원 끄기");
+        listviewadapter_power.addItem("재부팅");
+        listviewadapter_power.addItem("로그아웃");
 
         btn_new = (LinearLayout) view.findViewById(R.id.btn_kakao);
         btn_measure = (LinearLayout) view.findViewById(R.id.btn_measure);
@@ -162,21 +189,35 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 break;
 
             case R.id.btn_navi_center:
-                dialog_logout = new Dialog(ac);
-                dialog_logout.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog_logout.setContentView(R.layout.dialog_default);
+//                dialog_logout = new Dialog(ac);
+//                dialog_logout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//                dialog_logout.setContentView(R.layout.dialog_default);
+//
+//                tv_dialog = (TextView) dialog_logout.findViewById(R.id.tv_dialog);
+//                tv_dialog.setText("로그인 화면으로 돌아가시겠습니까?");
+//
+//                btn_dialog_ok = (TextView) dialog_logout.findViewById(R.id.btn_dialog_ok);
+//                btn_dialog_cancel = (TextView) dialog_logout.findViewById(R.id.btn_dialog_cancel);
+//                btn_dialog_cancel.setText("아니요");
+//
+//                btn_dialog_ok.setOnClickListener(this);
+//                btn_dialog_cancel.setOnClickListener(this);
+//
+//                dialog_logout.show();
 
-                tv_dialog = (TextView) dialog_logout.findViewById(R.id.tv_dialog);
-                tv_dialog.setText("로그인 화면으로 돌아가시겠습니까?");
+                // 뷰 호출
 
-                btn_dialog_ok = (TextView) dialog_logout.findViewById(R.id.btn_dialog_ok);
-                btn_dialog_cancel = (TextView) dialog_logout.findViewById(R.id.btn_dialog_cancel);
-                btn_dialog_cancel.setText("아니요");
+                dialog_power = new Dialog(ac);
+                dialog_power.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog_power.setContentView(R.layout.dialog_power);
 
-                btn_dialog_ok.setOnClickListener(this);
-                btn_dialog_cancel.setOnClickListener(this);
+                listview = (ListView)dialog_power.findViewById(R.id.Listview_Power);
+                listview.setAdapter(listviewadapter_power);
 
-                dialog_logout.show();
+                listview.setOnItemClickListener(this);
+
+                dialog_power.show();
+
                 break;
 
             case R.id.btn_navi_left:
@@ -226,16 +267,22 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                     ac.finish();
                 } else if (syncFlag) {
                     syncFlag = false;
+                    sync_progbar = (ProgressBar) dialog_Sync.findViewById(R.id.sync_progress);
+                    tv_dialog.setText("구글 드라이브 데이터 동기화중...");
+                    btn_dialog_ok.setVisibility(View.INVISIBLE);
+                    btn_dialog_cancel.setVisibility(View.INVISIBLE);
+                    sync_progbar.setVisibility(View.VISIBLE);
+
                     listener.connectAPIClient();
 
                     Query query = new Query.Builder()
                             .addFilter(Filters.eq(SearchableField.TITLE, "GLUCOSEDATA.db"))
                             .build();
                     Log.i("JJ", "sync 버튼 클릭");
+
                     Drive.DriveApi.query(listener.getAPIClient(), query)
                             .setResultCallback(metadataCallback);
 
-                    dialog_Sync.dismiss();
                 } else {
                     ac.finish();
                 }
@@ -279,6 +326,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                 InputStream is = new FileInputStream(file);
                                 byte[] buf = new byte[4096];
                                 int c;
+
                                 while ((c = is.read(buf, 0, buf.length)) > 0) {
                                     oos.write(buf, 0, c);
                                     oos.flush();
@@ -298,7 +346,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                     if (driveFileResult != null && driveFileResult.getStatus().isSuccess()) {
                                         DriveFile dFil = driveFileResult != null && driveFileResult.getStatus().isSuccess() ?
                                                 driveFileResult.getDriveFile() : null;
-                                        showMessage("DB Upload");
+                                        //showMessage("DB Upload");
                                         if (dFil != null) {
                                             // BINGO , file uploaded
                                             dFil.getMetadata(listener.getAPIClient()).setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
@@ -306,8 +354,22 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                                 public void onResult(DriveResource.MetadataResult metadataResult) {
                                                     if (metadataResult != null && metadataResult.getStatus().isSuccess()) {
                                                         mDriveId = metadataResult.getMetadata().getDriveId();
-
                                                     }
+                                                    Log.i("JJ", "Disconnect");
+                                                    if (listener.getAPIClient() != null) {
+                                                        listener.getAPIClient().disconnect();
+                                                    }
+                                                    tv_dialog.setText("데이터 동기화가 완료되었습니다.");
+                                                    sync_progbar.setVisibility(View.INVISIBLE);
+                                                    db.close();
+                                                    new Handler().postDelayed(new Runnable()
+                                                    {
+                                                        @Override
+                                                        public void run()
+                                                        {
+                                                            dialog_Sync.dismiss();
+                                                        }
+                                                    }, 500);
                                                 }
                                             });
                                         }
@@ -331,13 +393,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
 
         if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
         db = dbHelper.getWritableDatabase();
-
         file.open(listener.getAPIClient(), DriveFile.MODE_READ_ONLY, null)
                 .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
                     @Override
                     public void onResult(DriveApi.DriveContentsResult result) {
                         if (!result.getStatus().isSuccess()) {
-                            showMessage(" ERROR ");
+                            int status_code = result.getStatus().getStatusCode();
+                            if (status_code == 1502){
+                                db.getPath();
+                                dbfilepath = db.getPath();
+                                dbfilepath2 = db.getPath();
+                                File dbFile = new File(dbfilepath);
+
+                                saveToDrive(Drive.DriveApi.getRootFolder(listener.getAPIClient()), "GLUCOSEDATA.db", "application/x-sqlite3", dbFile);
+                            }
+                            else {
+                                showMessage(" ERROR jj ");
+                            }
                             return;
                         }
 
@@ -356,8 +428,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                     byte[] buffer = new byte[4 * 1024]; // or other buffer size
                                     int read;
 
+                                    int download_length = input.available() / buffer.length;
+                                    progress_interval = 40/download_length;
                                     while ((read = input.read(buffer)) != -1) {
                                         output.write(buffer, 0, read);
+                                        progress_val = progress_val + progress_interval;
                                     }
                                     output.flush();
                                 } finally {
@@ -371,7 +446,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                         } finally {
                             try {
                                 input.close();
-                                showMessage("DB Download");
+                                //showMessage("DB Download");
                                 download_complete = true;
                                 Log.i("JJ", "다운로드 완료");
                                 if (download_complete) {
@@ -381,7 +456,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                         dbHelper2 = new DBHelper(ac, "GLUCOSEDATA2.db", null, 1);
                                     db2 = dbHelper2.getWritableDatabase();
                                     merge_db(db, db2);
-
+                                    db2.close();
                                     db2.getPath();
                                     dbfilepath = db2.getPath();
                                     File mdbFile = new File(dbfilepath);
@@ -430,9 +505,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                 InputStream is = new FileInputStream(dbFile);
                                 byte[] buf = new byte[4096];
                                 int c;
+
+                                int update_length = is.available() / buf.length;
+                                progress_interval = 40/update_length;
                                 while ((c = is.read(buf, 0, buf.length)) > 0) {
                                     oos.write(buf, 0, c);
                                     oos.flush();
+                                    progress_val = progress_val + progress_interval;
+
                                 }
                             } finally {
                                 oos.close();
@@ -441,12 +521,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                 @Override
                                 public void onResult(Status result) {
                                     // Handle the response status
-                                    showMessage("DB Update");
+                                    //showMessage("DB Update");
 
                                     Log.i("JJ", "Disconnect");
                                     if (listener.getAPIClient() != null) {
                                         listener.getAPIClient().disconnect();
                                     }
+                                    tv_dialog.setText("데이터 동기화가 완료되었습니다.");
+                                    sync_progbar.setVisibility(View.INVISIBLE);
+                                    db.close();
+                                    new Handler().postDelayed(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            dialog_Sync.dismiss();
+                                        }
+                                    }, 500);
                                 }
                             });
                         } catch (IOException e) {
@@ -480,10 +571,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                         db = dbHelper.getWritableDatabase();
                         db.getPath();
                         dbfilepath = db.getPath();
+                        dbfilepath2 = db.getPath();
                         File dbFile = new File(dbfilepath);
 
                         saveToDrive(Drive.DriveApi.getRootFolder(listener.getAPIClient()), "GLUCOSEDATA.db", "application/x-sqlite3", dbFile);
                     } else {
+                        String file_name = "";
+                        file_name = mdbf.get(0).getTitle();
                         mDriveId = mdbf.get(0).getDriveId();
                         DriveFile file = mDriveId.asDriveFile();
 
@@ -499,9 +593,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         Cursor cursor = mdb2.rawQuery("SELECT * FROM GLUCOSEDATA", null);
         while (cursor.moveToNext()) {
             Cursor curChk = mdb.rawQuery("SELECT * FROM GLUCOSEDATA WHERE create_at= '" + cursor.getString(1) + "' ;", null);
-            if (!curChk.moveToFirst())
+            if (!curChk.moveToFirst()) {
                 mdb.execSQL("INSERT INTO GLUCOSEDATA VALUES( null, '" + cursor.getString(1) + "', " + cursor.getInt(2) + ", '" + cursor.getString(3) + "');");
+            }
+            curChk.close();
         }
+        cursor.close();
     }
 
     public void DB_Create() {
@@ -626,5 +723,44 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 break;
         }
         return false;
+    }
+
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        dialog_power.dismiss();
+
+        if(i == 0){
+            showMessage("test");
+        }
+        if(i == 1){
+            try {
+                Process p = Runtime.getRuntime().exec("su");
+                OutputStream os = p.getOutputStream();
+                os.write("reboot -p\n".getBytes());
+                os.flush();
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        if(i == 2){
+
+                dialog_logout = new Dialog(ac);
+                dialog_logout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog_logout.setContentView(R.layout.dialog_default);
+
+                tv_dialog = (TextView) dialog_logout.findViewById(R.id.tv_dialog);
+                tv_dialog.setText("로그인 화면으로 돌아가시겠습니까?");
+
+                btn_dialog_ok = (TextView) dialog_logout.findViewById(R.id.btn_dialog_ok);
+                btn_dialog_cancel = (TextView) dialog_logout.findViewById(R.id.btn_dialog_cancel);
+                btn_dialog_cancel.setText("아니요");
+
+                btn_dialog_ok.setOnClickListener(this);
+                btn_dialog_cancel.setOnClickListener(this);
+
+                dialog_logout.show();
+        }
     }
 }

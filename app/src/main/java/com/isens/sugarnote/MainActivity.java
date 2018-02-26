@@ -6,6 +6,8 @@ import android.content.IntentSender;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -15,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 
 import com.google.android.gms.common.ConnectionResult;
@@ -31,6 +34,8 @@ import com.kakao.util.KakaoParameterException;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
+import java.util.Date;
 
 import static com.kakao.util.helper.Utility.getPackageInfo;
 
@@ -38,7 +43,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
 
     private KakaoLink kakaoLink;
     private KakaoTalkLinkMessageBuilder kakaoTalkLinkMessageBuilder;
-
+    private DBHelper dbHelper;
+    private SQLiteDatabase db;
     private HomeFragment homeFragment;
     private UserFragment userFragment;
     private MeasureFragment measureFragment;
@@ -57,6 +63,11 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private GoogleApiClient mGoogleApiClient;
     private boolean isAPIConnected;
 
+    private String month, date, calendar_head, time, sugar, mealoption, Kakaostring;
+    private int today_Month, today_Date, today_Year, cursorSize;
+    private Calendar calendar;
+    private Cursor cursor;
+    private long now;
     // BGM CB register
 
     private final BloodGlucoseMonitorCallBack _bgm_callBack = new BloodGlucoseMonitorCallBack() {
@@ -145,26 +156,14 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                 break;
             case "SHARE":
 
-//                final String str = "공유할 내용";
-//                final String imgSrc = "http://cfile3.uf.tistory.com/image/215BCC41578ACAE31DFDBC";
-//                final String siteUrl = "등록한 url";
-//
-//                try {
-//                    kakaoLink = KakaoLink.getKakaoLink(getApplicationContext());
-//                    kakaoTalkLinkMessageBuilder = kakaoLink.createKakaoTalkLinkMessageBuilder();
-//                    kakaoTalkLinkMessageBuilder.addText(str);
-//                    kakaoTalkLinkMessageBuilder.addImage(imgSrc, 300, 200);
-//                    kakaoTalkLinkMessageBuilder.addWebButton("자세히 보기", siteUrl);
-//                    kakaoLink.sendMessage(kakaoTalkLinkMessageBuilder.build(), this);
-//                } catch (KakaoParameterException e) {
-//                    e.printStackTrace();
-//                }
+                get_Today_Glucose_Data();
 
                 try {
                     KakaoLink kakaoLink = KakaoLink.getKakaoLink(getApplicationContext());
                     kakaoTalkLinkMessageBuilder = kakaoLink.createKakaoTalkLinkMessageBuilder();
-                    kakaoTalkLinkMessageBuilder.addText("카카오톡으로 공유해요.");
+                    kakaoTalkLinkMessageBuilder.addText(Kakaostring);
                     kakaoLink.sendMessage(kakaoTalkLinkMessageBuilder.build(), this);
+
                 } catch (KakaoParameterException e) {
                     e.printStackTrace();
                 }
@@ -180,6 +179,52 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
             default:
                 break;
         }
+    }
+
+    private void get_Today_Glucose_Data(){
+
+        if (dbHelper == null)
+            dbHelper = new DBHelper(this, "GLUCOSEDATA.db", null, 1);
+
+        db = dbHelper.getWritableDatabase();
+
+        now = System.currentTimeMillis();
+        calendar = Calendar.getInstance();
+        calendar.setTime(new Date(now));
+
+        today_Month = calendar.get(Calendar.MONTH);
+        today_Date = calendar.get(Calendar.DATE);
+        today_Year = calendar.get(Calendar.YEAR);
+
+        if (today_Month  < 10)
+            month = "0" + (today_Month  + 1);
+        else
+            month = String.valueOf(today_Month  + 1);
+        if (today_Date < 10)
+            date = "0" + today_Date;
+        else
+            date = String.valueOf(today_Date);
+
+        calendar_head = today_Year + "/ " + month + "/ " + date;
+
+        String querry = "SELECT * FROM GLUCOSEDATA WHERE create_at LIKE '%" + calendar_head + "%';";
+        Log.d("querry", querry);
+        cursor = db.rawQuery(querry, null);
+
+        cursorSize = cursor.getCount();
+
+        Kakaostring = calendar_head;
+
+        while (cursor.moveToNext()) {
+            time = cursor.getString(1);
+            sugar = String.valueOf(cursor.getInt(2));
+            mealoption = cursor.getString(3);
+            Kakaostring = Kakaostring +"\n" + time.substring(14,22) + ",  " + mealoption + ",  " + sugar + "mg/dL";
+        }
+
+        if (cursorSize == 0)
+            Kakaostring = Kakaostring + "\nNo Data";
+
     }
 
     public static String getKeyHash(final Context context) {
