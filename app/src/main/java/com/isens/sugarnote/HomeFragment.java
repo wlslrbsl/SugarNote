@@ -120,7 +120,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
         view = inflater.inflate(R.layout.fragment_home, container, false);
 
         prefs_root = ac.getSharedPreferences("ROOT", 0);
-
         userAccount = prefs_root.getString("SIGNIN", "none");
         prefs_user = ac.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();

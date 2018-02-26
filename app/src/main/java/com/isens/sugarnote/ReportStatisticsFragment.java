@@ -45,16 +45,20 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
     private FragmentInterActionListener listener;
     private DBHelper dbHelper;
     private SQLiteDatabase db;
-    private SharedPreferences.Editor editor;
-    private SharedPreferences prefs;
+
     private ProgressBar mProgress_premeal, mProgress_postmeal, mProgress_nomeal, mProgress_count;
     private TextView txt_premeal_progress,txt_postmeal_progress,txt_nomeal_progress;
     private TextView txt_premeal_mean, txt_postmeal_mean, txt_nomeal_mean;
     private TextView txt_mean_count, txt_premeal_count, txt_postmeal_count, txt_nomeal_count;
     private TextView tv_header;
     private int during_option = 1;
+
     private View view;
     private Activity ac;
+
+    private SharedPreferences prefs_root, prefs_user;
+    private SharedPreferences.Editor editor_user;
+
     private int premeal_cnt, postmeal_cnt, nomeal_cnt;
     private int premeal_progress_val,postmeal_progress_val,nomeal_progress_val;
     private double premeal_count_portion, postmeal_count_portion;
@@ -67,6 +71,7 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
     private final String premeal = "식전", postmeal = "식후", nomeal = "공복";
     private int ll_max_premeal, ll_min_premeal, ll_max_postmeal, ll_min_postmeal, ll_max_nomeal, ll_min_nomeal;
     private int mValue_premeal=0, mValue_postmeal=0, mValue_nomeal=0, max_mValue=0;
+    private String userAccount;
     private Handler handler = new Handler(); // Thread 에서 화면에 그리기 위해서 필요
     int value = 0; // progressBar 값
     int add = 1; // 증가량, 방향
@@ -89,8 +94,10 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
         ac = getActivity();
         view = inflater.inflate(R.layout.fragment_report_statistics, container, false);
 
-        prefs = ac.getSharedPreferences("PrefName", 0);
-        editor = prefs.edit();
+        prefs_root = ac.getSharedPreferences("ROOT", 0);
+        userAccount = prefs_root.getString("SIGNIN", "none");
+        prefs_user = ac.getSharedPreferences(userAccount, 0);
+        editor_user = prefs_user.edit();
 
         if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
         db = dbHelper.getWritableDatabase();
@@ -139,12 +146,12 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
 
     public void Load_Pref() {
         /*목표치*/
-        ll_max_premeal = Integer.valueOf(prefs.getString("KEY_BEFORE_MAX", "100"));
-        ll_min_premeal = Integer.valueOf(prefs.getString("KEY_BEFORE_MIN", "80"));
-        ll_max_postmeal = Integer.valueOf(prefs.getString("KEY_AFTER_MAX", "120"));
-        ll_min_postmeal = Integer.valueOf(prefs.getString("KEY_AFTER_MIN", "100"));
-        ll_max_nomeal = Integer.valueOf(prefs.getString("KEY_EMPTY_MAX", "110"));
-        ll_min_nomeal = Integer.valueOf(prefs.getString("KEY_EMPTY_MIN", "90"));
+        ll_max_premeal = Integer.valueOf(prefs_user.getInt("PREHIGH", 100));
+        ll_min_premeal = Integer.valueOf(prefs_user.getInt("PRELOW", 50));
+        ll_max_postmeal = Integer.valueOf(prefs_user.getInt("POSTHIGH", 150));
+        ll_min_postmeal = Integer.valueOf(prefs_user.getInt("POSTLOW", 100));
+        ll_max_nomeal = Integer.valueOf(prefs_user.getInt("NOHIGH", 125));
+        ll_min_nomeal = Integer.valueOf(prefs_user.getInt("NOLOW", 75));
     }
 
     public void set_Data(int duringoption) {

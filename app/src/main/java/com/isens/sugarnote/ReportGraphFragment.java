@@ -48,6 +48,9 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
     private View view;
     private Activity ac;
 
+    private SharedPreferences prefs_root, prefs_user;
+    private SharedPreferences.Editor editor_user;
+
     private FragmentInterActionListener listener;
 
     private Button btn_navi_right, btn_navi_center, btn_navi_left;
@@ -55,12 +58,9 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
     private DBHelper dbHelper;
     private SQLiteDatabase db;
 
-    private SharedPreferences.Editor editor;
-    private SharedPreferences prefs;
-
     private TextView tv_header;
     private final String premeal = "식전", postmeal = "식후", nomeal = "공복";
-    private String meal_option = "";
+    private String meal_option = "", userAccount;
     private ArrayList<Entry> glucose_premeal, glucose_postmeal, glucose_nomeal;
     private LineChart mChart;
     private int ll_max_premeal, ll_min_premeal, ll_max_postmeal, ll_min_postmeal, ll_max_nomeal, ll_min_nomeal;
@@ -91,8 +91,10 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         ac = getActivity();
         view = inflater.inflate(R.layout.fragment_report_graph, container, false);
 
-        prefs = ac.getSharedPreferences("PrefName", 0);
-        editor = prefs.edit();
+        prefs_root = ac.getSharedPreferences("ROOT", 0);
+        userAccount = prefs_root.getString("SIGNIN", "none");
+        prefs_user = ac.getSharedPreferences(userAccount, 0);
+        editor_user = prefs_user.edit();
 
         btn_navi_center = (Button) ac.findViewById(R.id.btn_navi_center);
         btn_navi_right = (Button) ac.findViewById(R.id.btn_navi_right);
@@ -142,9 +144,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
             set_linedata(premeal);
             set_chart(premeal);
             show_limitline();
-        }
-        else
-        {
+        } else {
             meal_option = premeal;
             mChart.clear();
         }
@@ -158,7 +158,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         Cursor c;
         int size;
         boolean return_val = false;
-        switch(meal) {
+        switch (meal) {
             case premeal:
                 query = "SELECT * FROM GLUCOSEDATA WHERE meal = '식전';";
                 c = db.rawQuery(query, null);
@@ -280,7 +280,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
                     e1.printStackTrace();
                 }
 
-            break;
+                break;
 
             case nomeal:
                 query = "SELECT * FROM GLUCOSEDATA WHERE meal = '공복' ORDER BY create_at ASC;";
@@ -319,7 +319,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
-            break;
+                break;
         }
 
     }
@@ -463,15 +463,14 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
             @Override
             public void onChartDoubleTapped(MotionEvent me) {
 
-                if(x_Axix_option == during_week) {
+                if (x_Axix_option == during_week) {
                     x_Axix_option = during_month;
                     mChart.setVisibleXRangeMinimum(30f);
                     mChart.setVisibleXRangeMaximum(30f);
                     mChart.moveViewToX(end);
                     mChart.invalidate();
                     Toast.makeText(ac, "1달", Toast.LENGTH_SHORT).show();
-                }
-                else{
+                } else {
                     x_Axix_option = during_week;
                     mChart.setVisibleXRangeMinimum(7f);
                     mChart.setVisibleXRangeMaximum(7f);
@@ -505,12 +504,12 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         glucose_nomeal = new ArrayList<Entry>();
 
          /*목표치*/
-        ll_max_premeal = Integer.valueOf(prefs.getString("KEY_BEFORE_MAX", "100"));
-        ll_min_premeal = Integer.valueOf(prefs.getString("KEY_BEFORE_MIN", "80"));
-        ll_max_postmeal = Integer.valueOf(prefs.getString("KEY_AFTER_MAX", "120"));
-        ll_min_postmeal = Integer.valueOf(prefs.getString("KEY_AFTER_MIN", "100"));
-        ll_max_nomeal = Integer.valueOf(prefs.getString("KEY_EMPTY_MAX", "110"));
-        ll_min_nomeal = Integer.valueOf(prefs.getString("KEY_EMPTY_MIN", "90"));
+        ll_max_premeal = Integer.valueOf(prefs_user.getInt("PREHIGH", 100));
+        ll_min_premeal = Integer.valueOf(prefs_user.getInt("PRELOW", 50));
+        ll_max_postmeal = Integer.valueOf(prefs_user.getInt("POSTHIGH", 150));
+        ll_min_postmeal = Integer.valueOf(prefs_user.getInt("POSTLOW", 100));
+        ll_max_nomeal = Integer.valueOf(prefs_user.getInt("NOHIGH", 125));
+        ll_min_nomeal = Integer.valueOf(prefs_user.getInt("NOLOW", 75));
 
     }
 
@@ -557,7 +556,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
                 lineDataSet3.setCircleColor(Color.parseColor("#FF002060"));
                 lineDataSets.clear();
                 lineDataSets.add(lineDataSet3);
-            break;
+                break;
         }
         //lineDataSets.add(lineDataSet1);
 
@@ -669,7 +668,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
     }
 
     void get_max_min(String meal) {
-        String query ="";
+        String query = "";
         Cursor c;
         switch (meal) {
             case premeal:
@@ -712,7 +711,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()) {
+        switch (v.getId()) {
             case R.id.btn_navi_center:
                 listener.setFrag("HOME");
                 break;
@@ -723,46 +722,41 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
 
             case R.id.btn_navi_left:
 
-                if(meal_option == premeal) {
+                if (meal_option == premeal) {
                     meal_option = postmeal;
                     mChart.clear();
-                    if(isExistdata(postmeal)) {
+                    if (isExistdata(postmeal)) {
                         set_XAxis();
                         lineDataSets.clear();
                         lineDataSets.add(lineDataSet2);
                         set_chart(postmeal);
-                    }
-                    else
+                    } else
                         mChart.clear();
 
                     tv_header.setText("식후 혈당값");
                     btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_postmeal);
-                }
-                else if(meal_option == postmeal){
+                } else if (meal_option == postmeal) {
                     meal_option = nomeal;
                     mChart.clear();
-                    if(isExistdata(nomeal)) {
+                    if (isExistdata(nomeal)) {
                         set_XAxis();
                         lineDataSets.clear();
                         lineDataSets.add(lineDataSet3);
                         set_chart(nomeal);
-                    }
-                    else
+                    } else
                         mChart.clear();
 
                     tv_header.setText("공복 혈당값");
                     btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_nomeal);
-                }
-                else{
+                } else {
                     meal_option = premeal;
                     mChart.clear();
-                    if(isExistdata(premeal)) {
+                    if (isExistdata(premeal)) {
                         set_XAxis();
                         lineDataSets.clear();
                         lineDataSets.add(lineDataSet1);
                         set_chart(premeal);
-                    }
-                    else
+                    } else
                         mChart.clear();
 
                     tv_header.setText("식전 혈당값");
@@ -776,7 +770,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private void set_chart(String meal){
+    private void set_chart(String meal) {
         YAxis yAxisRight = mChart.getAxisRight();
         yAxisRight.setEnabled(false);
         mChart.setData(new LineData(xAXES, lineDataSets));
@@ -791,7 +785,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         mChart.setScaleYEnabled(false);
         mChart.setScaleXEnabled(false);
         mChart.setAutoScaleMinMaxEnabled(false);
-        switch(meal){
+        switch (meal) {
             case premeal:
                 mChart.getAxisLeft().setAxisMinValue(min_yVal_premeal);
                 mChart.getAxisLeft().setAxisMaxValue(max_yVal_premeal);
@@ -811,11 +805,10 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
 
         mChart.getAxisLeft().setTextSize(13);
 
-        if(x_Axix_option == during_week) {
+        if (x_Axix_option == during_week) {
             mChart.setVisibleXRangeMaximum(7f);
             mChart.setVisibleXRangeMinimum(7f);
-        }
-        else{
+        } else {
             mChart.setVisibleXRangeMaximum(30f);
             mChart.setVisibleXRangeMinimum(30f);
         }
