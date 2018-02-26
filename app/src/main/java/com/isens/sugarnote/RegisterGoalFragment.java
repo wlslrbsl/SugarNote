@@ -36,7 +36,7 @@ public class RegisterGoalFragment extends Fragment implements View.OnClickListen
     private ObjectAnimator fadeInTextView, fadeOutTextView, fadeInLinearLayout, fadeOutLinearLayout;
     private AnimatorSet fadeInOutTextView;
 
-    private String goalPremealLow, goalPostmealLow, goalNomealLow, goalPremealHigh, goalPostmealHigh, goalNomealHigh, userAccount;
+    private String userAccount;
     private static String animatorFlagGoal;
 
     private int userId;
@@ -162,19 +162,12 @@ public class RegisterGoalFragment extends Fragment implements View.OnClickListen
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_next_register:
-                goalPremealLow = rangeSeekBarPremeal.getSelectedMinValue().toString();
-                goalPremealHigh = rangeSeekBarPremeal.getSelectedMaxValue().toString();
-                goalPostmealLow = rangeSeekBarPostmeal.getSelectedMinValue().toString();
-                goalPostmealHigh = rangeSeekBarPostmeal.getSelectedMaxValue().toString();
-                goalNomealLow = rangeSeekNomeal.getSelectedMinValue().toString();
-                goalNomealHigh = rangeSeekNomeal.getSelectedMaxValue().toString();
-
-                editor_user.putString("PRELOW", goalPremealLow);
-                editor_user.putString("PREHIGH", goalPremealHigh);
-                editor_user.putString("POSTLOW", goalPostmealLow);
-                editor_user.putString("POSTHIGH", goalPostmealHigh);
-                editor_user.putString("NOLOW", goalNomealLow);
-                editor_user.putString("NOHIGH", goalNomealHigh);
+                editor_user.putInt("PRELOW", rangeSeekBarPremeal.getSelectedMinValue());
+                editor_user.putInt("PREHIGH", rangeSeekBarPremeal.getSelectedMaxValue());
+                editor_user.putInt("POSTLOW", rangeSeekBarPostmeal.getSelectedMinValue());
+                editor_user.putInt("POSTHIGH", rangeSeekBarPostmeal.getSelectedMaxValue());
+                editor_user.putInt("NOLOW", rangeSeekNomeal.getSelectedMinValue());
+                editor_user.putInt("NOHIGH", rangeSeekNomeal.getSelectedMaxValue());
                 editor_user.commit();
 
                 fadeOutLinearLayout.start();

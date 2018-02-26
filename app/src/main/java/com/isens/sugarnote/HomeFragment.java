@@ -66,7 +66,7 @@ import static com.github.mikephil.charting.charts.Chart.LOG_TAG;
 public class HomeFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener, ListView.OnItemClickListener {
 
     private SharedPreferences prefs_root, prefs_user;
-    private SharedPreferences.Editor editor_root, editor_user;
+    private SharedPreferences.Editor editor_user;
 
     private Activity ac;
     private View view;
@@ -189,23 +189,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 break;
 
             case R.id.btn_navi_center:
-//                dialog_logout = new Dialog(ac);
-//                dialog_logout.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//                dialog_logout.setContentView(R.layout.dialog_default);
-//
-//                tv_dialog = (TextView) dialog_logout.findViewById(R.id.tv_dialog);
-//                tv_dialog.setText("로그인 화면으로 돌아가시겠습니까?");
-//
-//                btn_dialog_ok = (TextView) dialog_logout.findViewById(R.id.btn_dialog_ok);
-//                btn_dialog_cancel = (TextView) dialog_logout.findViewById(R.id.btn_dialog_cancel);
-//                btn_dialog_cancel.setText("아니요");
-//
-//                btn_dialog_ok.setOnClickListener(this);
-//                btn_dialog_cancel.setOnClickListener(this);
-//
-//                dialog_logout.show();
+                dialog_logout = new Dialog(ac);
+                dialog_logout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog_logout.setContentView(R.layout.dialog_default);
 
-                // 뷰 호출
+                tv_dialog = (TextView) dialog_logout.findViewById(R.id.tv_dialog);
+                tv_dialog.setText("로그인 화면으로 돌아가시겠습니까?");
 
                 dialog_power = new Dialog(ac);
                 dialog_power.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -256,16 +245,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 break;
 
             case R.id.btn_dialog_ok:
-                if (createDBFlag) {
-                    DB_Create();
-                    createDBFlag = false;
-                    dialog_createDB.dismiss();
-                } else if (deleteLogFlag) {
-                    editor_user.clear();
-                    editor_user.commit();
-                    deleteLogFlag = false;
-                    ac.finish();
-                } else if (syncFlag) {
+                if (syncFlag) {
                     syncFlag = false;
                     sync_progbar = (ProgressBar) dialog_Sync.findViewById(R.id.sync_progress);
                     tv_dialog.setText("구글 드라이브 데이터 동기화중...");
@@ -283,6 +263,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                     Drive.DriveApi.query(listener.getAPIClient(), query)
                             .setResultCallback(metadataCallback);
 
+                    dialog_Sync.dismiss();
                 } else {
                     ac.finish();
                 }
@@ -290,13 +271,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 break;
 
             case R.id.btn_dialog_cancel:
-                if (createDBFlag) {
-                    createDBFlag = false;
-                    dialog_createDB.dismiss();
-                } else if (deleteLogFlag) {
-                    deleteLogFlag = false;
-                    dialog_deleteLOG.dismiss();
-                } else if (syncFlag) {
+                if (syncFlag) {
                     syncFlag = false;
                     dialog_Sync.dismiss();
                 } else {
@@ -393,6 +368,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
 
         if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
         db = dbHelper.getWritableDatabase();
+
         file.open(listener.getAPIClient(), DriveFile.MODE_READ_ONLY, null)
                 .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
                     @Override

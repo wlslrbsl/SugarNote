@@ -140,7 +140,6 @@ public class UserFragment extends Fragment implements View.OnClickListener {
 
             case R.id.btn_navi_right:
                 listener.setFrag("GOAL");
-                Toast.makeText(ac, "혈당목표치 조절", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.ll_male_profile:

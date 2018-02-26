@@ -259,8 +259,8 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
                     mealOptionReset();
                     premeal_btn.setTextColor(Color.BLUE);
                     _isResultView = false;
-
                 } else {
+                    _isResultView = false;
                     dialog_no_save.dismiss();
                     listener.setFrag("HOME");
                 }
@@ -274,7 +274,6 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
                 break;
 
             default:
-                Toast.makeText(ac, "망", Toast.LENGTH_SHORT).show();
                 break;
         }
     }

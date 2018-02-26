@@ -24,16 +24,14 @@
                 android:layout_height="0dp"
                 android:layout_margin="10dp"
                 android:layout_marginBottom="0dp"
-                android:layout_weight="5"
-                 />
+                android:layout_weight="5" />
 
             <TextView
                 android:id="@+id/tv_no_alarm"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1.5"
-                android:gravity="center_horizontal"
-                android:text="알람 1" />
+                android:gravity="center_horizontal" />
 
         </LinearLayout>
 

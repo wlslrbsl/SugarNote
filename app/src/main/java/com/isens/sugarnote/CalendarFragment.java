@@ -28,7 +28,7 @@ import java.util.Date;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CalendarFragment extends Fragment implements View.OnClickListener, DrawerLayout.DrawerListener, GridView.OnItemClickListener {
+public class CalendarFragment extends Fragment implements View.OnClickListener, GridView.OnItemClickListener {
 
     private Activity ac;
     private View view;
@@ -42,17 +42,18 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private LinearLayoutManager linearLayoutManager;
 
     private GridView gv_calendar;
-    private TextView tv_drawer_month, tv_drawer_year, tv_calendar_date;
+    private TextView tv_drawer_month, tv_drawer_year, tv_calendar_date, tv_calendar_month, tv_calendar_day;
 
-    private Button btn_navi_center, btn_navi_right, btn_navi_left;
-    private LinearLayout btn_calendar_next, btn_calendar_pre;
+    private Button btn_navi_center, btn_navi_right, btn_navi_left, btn_recycler_backward, btn_recycler_forward;
+    private LinearLayout btn_calendar_next, btn_calendar_pre, ll_recycler_view;
 
     private FragmentInterActionListener listener;
     private Calendar calendar;
     private Cursor cursor;
 
+    private String[] days = {"일", "월", "화", "수", "목", "금", "토"};
     private String month = "", date = "", time, mealoption, calendar_head;
-    private int whatDay, whatDate, tmpDate, tmpDay, maxDate, firstDay, whatMonth, whatYear, selYear, selMonth, selDate, sugar, cursorSize;
+    private int whatDay, whatDate, tmpDate, tmpDay, maxDate, firstDay, whatMonth, whatYear, selYear, selMonth, selDate, sugar, cursorSize, selDay;
     private long now;
 
     public CalendarFragment() {
@@ -73,7 +74,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
         drawer_layout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
-        drawer_layout.addDrawerListener(this);
         drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         gv_calendar = (GridView) view.findViewById(R.id.gv_calendar);
@@ -82,13 +82,18 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         tv_drawer_month = (TextView) view.findViewById(R.id.tv_drawer_month);
         tv_drawer_year = (TextView) view.findViewById(R.id.tv_drawer_year);
         tv_calendar_date = (TextView) view.findViewById(R.id.tv_calendar_date);
+        tv_calendar_month = (TextView) view.findViewById(R.id.tv_calendar_month);
+        tv_calendar_day = (TextView) view.findViewById(R.id.tv_calendar_day);
 
         btn_navi_center = (Button) ac.findViewById(R.id.btn_navi_center);
         btn_navi_right = (Button) ac.findViewById(R.id.btn_navi_right);
         btn_navi_left = (Button) ac.findViewById(R.id.btn_navi_left);
+        btn_recycler_backward = (Button) view.findViewById(R.id.btn_recycler_backward);
+        btn_recycler_forward = (Button) view.findViewById(R.id.btn_recycler_forward);
 
         btn_calendar_next = (LinearLayout) view.findViewById(R.id.btn_calendar_next);
         btn_calendar_pre = (LinearLayout) view.findViewById(R.id.btn_calendar_pre);
+        ll_recycler_view = (LinearLayout) view.findViewById(R.id.ll_recycler_view);
 
         gv_calendar.setOnItemClickListener(this);
 
@@ -97,6 +102,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         btn_navi_right.setOnClickListener(this);
         btn_calendar_next.setOnClickListener(this);
         btn_calendar_pre.setOnClickListener(this);
+        btn_recycler_backward.setOnClickListener(this);
+        btn_recycler_forward.setOnClickListener(this);
 
         btn_navi_center.setBackgroundResource(R.drawable.state_btn_navi_home);
         btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_alarm);
@@ -141,6 +148,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         selYear = whatYear;
         selMonth = whatMonth;
         selDate = whatDate;
+        selDay = whatDay;
     }
 
     public void calendarCalculate() {
@@ -175,8 +183,20 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             case R.id.btn_navi_right:
                 if (!drawer_layout.isDrawerOpen(Gravity.START)) {
                     drawer_layout.openDrawer(Gravity.START);
-                } else if (drawer_layout.isDrawerOpen(Gravity.START))
+                    ll_recycler_view.setVisibility(View.INVISIBLE);
+                    btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_listview);
+                    btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_today);
+                    setDrawer();
+                } else if (drawer_layout.isDrawerOpen(Gravity.START)) {
                     drawer_layout.closeDrawer(Gravity.START);
+                    ll_recycler_view.setVisibility(View.VISIBLE);
+                    btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_calendar);
+                    btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_alarm);
+                    whatYear = selYear;
+                    whatMonth = selMonth;
+                    whatDate = selDate;
+                    selDay = whatDay;
+                }
                 break;
 
             case R.id.btn_navi_left:
@@ -206,46 +226,55 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 calendarCalculate();
                 setDrawer();
                 break;
+
+            case R.id.btn_recycler_backward:
+                calendar.set(selYear,selMonth,selDate);
+                calendar.add(Calendar.DAY_OF_WEEK, -1);
+                calendarCalculate();
+
+                selYear = whatYear;
+                selMonth = whatMonth;
+                selDate = whatDate;
+                selDay = whatDay;
+
+                calenderView();
+                set_recycler();
+                break;
+
+            case R.id.btn_recycler_forward:
+                calendar.set(selYear,selMonth,selDate);
+                calendar.add(Calendar.DAY_OF_WEEK, 1);
+                calendarCalculate();
+
+                selYear = whatYear;
+                selMonth = whatMonth;
+                selDate = whatDate;
+                selDay = whatDay;
+
+                calenderView();
+                set_recycler();
+                break;
+
+            default:
+                break;
         }
     }
 
     @Override
-    public void onDrawerSlide(View drawerView, float slideOffset) {
-
-    }
-
-    @Override
-    public void onDrawerOpened(View drawerView) {
-        btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_listview);
-        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_today);
-        setDrawer();
-    }
-
-    @Override
-    public void onDrawerClosed(View drawerView) {
-        btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_calendar);
-        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_alarm);
-        whatYear = selYear;
-        whatMonth = selMonth;
-        whatDate = selDate;
-    }
-
-    @Override
-    public void onDrawerStateChanged(int newState) {
-
-    }
-
-    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        ll_recycler_view.setVisibility(View.VISIBLE);
         if (position < firstDay + 6 || maxDate + firstDay + 5 < position) {
             Log.d("calendar", "blank");
         } else {
             selDate = Integer.parseInt((String) parent.getAdapter().getItem(position));
             selMonth = whatMonth;
             selYear = whatYear;
+            selDay = whatDay;
             calenderView();
             set_recycler();
             drawer_layout.closeDrawer(Gravity.START);
+            btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_calendar);
+            btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_alarm);
         }
     }
 
@@ -258,8 +287,12 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             date = "0" + selDate;
         else
             date = String.valueOf(selDate);
+
         calendar_head = selYear + "/ " + month + "/ " + date;
-        tv_calendar_date.setText(calendar_head);
+
+        tv_calendar_month.setText(selYear + ". " + month + ".");
+        tv_calendar_date.setText(String.valueOf(selDate));
+        tv_calendar_day.setText("(" + days[selDay - 1] + ")");
     }
 
     public void read_glucosedb(Cursor c) {
@@ -269,9 +302,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     void set_recycler() {
-
         String querry = "SELECT * FROM GLUCOSEDATA WHERE create_at LIKE '%" + calendar_head + "%';";
-        Log.d("querry", querry);
         cursor = db.rawQuery(querry, null);
 
         cursorSize = cursor.getCount();
@@ -279,7 +310,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         while (cursor.moveToNext()) {
             read_glucosedb(cursor);
-            recyclerViewAdapter.addItem(time.substring(14,22), mealoption, String.valueOf(sugar));
+            recyclerViewAdapter.addItem(time.substring(14, 22), mealoption, String.valueOf(sugar));
         }
 
         if (cursorSize == 0)

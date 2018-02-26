@@ -61,6 +61,9 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         btn_logo.setOnLongClickListener(this);
         tv_version.setOnLongClickListener(this);
 
+        /*String str = "1234";
+        Toast.makeText(this, ""+(char) (str.charAt(1)+1), Toast.LENGTH_SHORT).show();*/
+
         prefs_root = getSharedPreferences("ROOT", 0);
         editor_root = prefs_root.edit();
 
