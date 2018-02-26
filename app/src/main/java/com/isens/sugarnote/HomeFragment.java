@@ -49,10 +49,10 @@ import java.util.Date;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener {
+public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private SharedPreferences prefs_root, prefs_user;
-    private SharedPreferences.Editor editor_root, editor_user;
+    private SharedPreferences.Editor editor_user;
 
     private Activity ac;
     private View view;
@@ -98,7 +98,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         view = inflater.inflate(R.layout.fragment_home, container, false);
 
         prefs_root = ac.getSharedPreferences("ROOT", 0);
-        editor_root = prefs_root.edit();
         userAccount = prefs_root.getString("SIGNIN", "none");
         prefs_user = ac.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
@@ -118,9 +117,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_sync);
         btn_navi_right.setEnabled(true);
         btn_navi_left.setEnabled(true);
-
-        btn_navi_left.setOnLongClickListener(this);
-        btn_navi_right.setOnLongClickListener(this);
 
         btn_navi_center.setOnClickListener(this);
         btn_navi_right.setOnClickListener(this);
@@ -185,7 +181,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
 
             case R.id.btn_navi_right:
 
-                if(wifi.isWifiEnabled()) {
+                if (wifi.isWifiEnabled()) {
                     syncFlag = true;
                     dialog_Sync = new Dialog(ac);
                     dialog_Sync.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -215,16 +211,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 break;
 
             case R.id.btn_dialog_ok:
-                if (createDBFlag) {
-                    DB_Create();
-                    createDBFlag = false;
-                    dialog_createDB.dismiss();
-                } else if (deleteLogFlag) {
-                    editor_user.clear();
-                    editor_user.commit();
-                    deleteLogFlag = false;
-                    ac.finish();
-                } else if (syncFlag) {
+                if (syncFlag) {
                     syncFlag = false;
                     listener.connectAPIClient();
 
@@ -239,17 +226,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 } else {
                     ac.finish();
                 }
-
                 break;
 
             case R.id.btn_dialog_cancel:
-                if (createDBFlag) {
-                    createDBFlag = false;
-                    dialog_createDB.dismiss();
-                } else if (deleteLogFlag) {
-                    deleteLogFlag = false;
-                    dialog_deleteLOG.dismiss();
-                } else if (syncFlag) {
+                if (syncFlag) {
                     syncFlag = false;
                     dialog_Sync.dismiss();
                 } else {
@@ -382,7 +362,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                     db2 = dbHelper2.getWritableDatabase();
                                     merge_db(db, db2);
 
-                                    db2.getPath();
                                     dbfilepath = db2.getPath();
                                     File mdbFile = new File(dbfilepath);
                                     mdbFile.delete();
@@ -502,129 +481,5 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
             if (!curChk.moveToFirst())
                 mdb.execSQL("INSERT INTO GLUCOSEDATA VALUES( null, '" + cursor.getString(1) + "', " + cursor.getInt(2) + ", '" + cursor.getString(3) + "');");
         }
-    }
-
-    public void DB_Create() {
-        String save_date;
-        if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
-        db = dbHelper.getWritableDatabase();
-
-        dbHelper.clear_db();
-
-        if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
-        db = dbHelper.getWritableDatabase();
-
-        long now = System.currentTimeMillis();
-        Date date = new Date(now);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/ MM/ dd, HH:mm:ss");
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-
-        Date caldate = cal.getTime();
-        double ran = Math.random(); // 0< ran<1 사이의 실수
-        int val = (int) (ran * 20);
-        int before_val = val + 90;
-        int after_val = val + 100;
-        int empty_val = val + 110;
-
-        for (int i = 0; i < 40; i++) {
-
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            before_val = val + 90;
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            after_val = val + 100;
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            empty_val = val + 110;
-
-            cal.add(Calendar.DATE, -1);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, empty_val, "공복");
-
-            cal.add(Calendar.SECOND, 5);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, before_val, "식전");
-
-            cal.add(Calendar.SECOND, 5);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, after_val, "식후");
-
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            before_val = val + 90;
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            after_val = val + 100;
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            empty_val = val + 110;
-
-            cal.add(Calendar.SECOND, 5);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, empty_val, "공복");
-
-            cal.add(Calendar.SECOND, 5);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, before_val, "식전");
-
-            cal.add(Calendar.SECOND, 5);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, after_val, "식후");
-        }
-
-        db.close();
-
-    }
-
-    @Override
-    public boolean onLongClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_navi_right:
-                dialog_createDB = new Dialog(ac);
-                dialog_createDB.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog_createDB.setContentView(R.layout.dialog_default);
-
-                tv_dialog = (TextView) dialog_createDB.findViewById(R.id.tv_dialog);
-                tv_dialog.setText("혈당 데이터를 생성하시겠습니까?");
-
-                btn_dialog_ok = (TextView) dialog_createDB.findViewById(R.id.btn_dialog_ok);
-                btn_dialog_cancel = (TextView) dialog_createDB.findViewById(R.id.btn_dialog_cancel);
-                btn_dialog_cancel.setText("아니요");
-
-                btn_dialog_ok.setOnClickListener(this);
-                btn_dialog_cancel.setOnClickListener(this);
-
-                createDBFlag = true;
-                dialog_createDB.show();
-                break;
-
-            case R.id.btn_navi_left:
-                dialog_deleteLOG = new Dialog(ac);
-                dialog_deleteLOG.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog_deleteLOG.setContentView(R.layout.dialog_default);
-
-                tv_dialog = (TextView) dialog_deleteLOG.findViewById(R.id.tv_dialog);
-                tv_dialog.setText("로그인된 계정을 삭제하시겠습니까?");
-
-                btn_dialog_ok = (TextView) dialog_deleteLOG.findViewById(R.id.btn_dialog_ok);
-                btn_dialog_cancel = (TextView) dialog_deleteLOG.findViewById(R.id.btn_dialog_cancel);
-                btn_dialog_cancel.setText("아니요");
-
-                btn_dialog_ok.setOnClickListener(this);
-                btn_dialog_cancel.setOnClickListener(this);
-
-                deleteLogFlag = true;
-                dialog_deleteLOG.show();
-                break;
-        }
-        return false;
     }
 }

@@ -3,6 +3,7 @@ package com.isens.sugarnote;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -21,12 +22,16 @@ public class UserGoalFragment extends Fragment implements View.OnClickListener{
     private Activity ac;
     private View view;
 
+    private SharedPreferences prefs_root, prefs_user;
+    private SharedPreferences.Editor editor_user;
+
     private FragmentInterActionListener listener;
 
     private RangeSeekBar rangeSeekBarPremeal, rangeSeekBarPostmeal, rangeSeekNomeal;
     private LinearLayout ll_seekbar_premeal, ll_seekbar_postmeal, ll_seekbar_nomeal;
 
     private Button btn_navi_center, btn_navi_left, btn_navi_right;
+    private String userAccount;
 
     public UserGoalFragment() {
         // Required empty public constructor
@@ -44,6 +49,11 @@ public class UserGoalFragment extends Fragment implements View.OnClickListener{
         // Inflate the layout for this fragment
         ac = getActivity();
         view = inflater.inflate(R.layout.fragment_user_goal, container, false);
+
+        prefs_root = ac.getSharedPreferences("ROOT", 0);
+        userAccount = prefs_root.getString("SIGNIN", "none");
+        prefs_user = ac.getSharedPreferences(userAccount, 0);
+        editor_user = prefs_user.edit();
 
         ll_seekbar_premeal = (LinearLayout) view.findViewById(R.id.ll_seekbar_premeal);
         ll_seekbar_postmeal = (LinearLayout) view.findViewById(R.id.ll_seekbar_postmeal);
@@ -70,20 +80,20 @@ public class UserGoalFragment extends Fragment implements View.OnClickListener{
         rangeSeekBarPremeal = new RangeSeekBar<Integer>(ac);
 
         rangeSeekBarPremeal.setRangeValues(0, 200);
-        rangeSeekBarPremeal.setSelectedMaxValue(100);
-        rangeSeekBarPremeal.setSelectedMinValue(50);
+        rangeSeekBarPremeal.setSelectedMaxValue(prefs_user.getInt("PREMAX",100));
+        rangeSeekBarPremeal.setSelectedMinValue(prefs_user.getInt("PREMIN",50));
 
         rangeSeekBarPostmeal = new RangeSeekBar<Integer>(ac);
 
         rangeSeekBarPostmeal.setRangeValues(0, 200);
-        rangeSeekBarPostmeal.setSelectedMaxValue(150);
-        rangeSeekBarPostmeal.setSelectedMinValue(100);
+        rangeSeekBarPostmeal.setSelectedMaxValue(prefs_user.getInt("POSTMAX",150));
+        rangeSeekBarPostmeal.setSelectedMinValue(prefs_user.getInt("POSTMIN",100));
 
         rangeSeekNomeal = new RangeSeekBar<Integer>(ac);
 
         rangeSeekNomeal.setRangeValues(0, 200);
-        rangeSeekNomeal.setSelectedMaxValue(125);
-        rangeSeekNomeal.setSelectedMinValue(75);
+        rangeSeekNomeal.setSelectedMaxValue(prefs_user.getInt("NOMAX",125));
+        rangeSeekNomeal.setSelectedMinValue(prefs_user.getInt("NOMIN",75));
 
         ll_seekbar_premeal.addView(rangeSeekBarPremeal);
         ll_seekbar_postmeal.addView(rangeSeekBarPostmeal);
@@ -95,7 +105,6 @@ public class UserGoalFragment extends Fragment implements View.OnClickListener{
         switch (v.getId()) {
             case R.id.btn_navi_center :
                 listener.setFrag("USER");
-                Toast.makeText(ac, "저장", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_navi_left :
                 listener.setFrag("HOME");

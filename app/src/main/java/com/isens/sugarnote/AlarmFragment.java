@@ -73,9 +73,9 @@ public class AlarmFragment extends Fragment implements View.OnClickListener, Ada
         btn_navi_left.setOnClickListener(this);
         btn_navi_right.setOnClickListener(this);
 
-        btn_navi_center.setBackgroundResource(R.drawable.state_btn_navi_add_alarm);
-        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_leftarrow);
-        btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_calendar);
+        btn_navi_center.setBackgroundResource(R.drawable.state_btn_navi_home);
+        btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_listview);
+        btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_add_alarm);
 
         setListView();
         return view;
@@ -85,12 +85,7 @@ public class AlarmFragment extends Fragment implements View.OnClickListener, Ada
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_navi_center:
-                dialog_alarm = new AlarmDialog(ac);
-                dialog_alarm.show();
-                btn_alarm_save = (TextView) dialog_alarm.findViewById(R.id.btn_alarm_save);
-                btn_alarm_cancel = (TextView) dialog_alarm.findViewById(R.id.btn_alarm_cancel);
-                btn_alarm_save.setOnClickListener(this);
-                btn_alarm_cancel.setOnClickListener(this);
+                listener.setFrag("HOME");
                 break;
 
             case R.id.btn_navi_left:
@@ -98,9 +93,12 @@ public class AlarmFragment extends Fragment implements View.OnClickListener, Ada
                 break;
 
             case R.id.btn_navi_right:
-                editor_user.putInt("ALARM#",0);
-                editor_user.commit();
-                setListView();
+                dialog_alarm = new AlarmDialog(ac);
+                dialog_alarm.show();
+                btn_alarm_save = (TextView) dialog_alarm.findViewById(R.id.btn_alarm_save);
+                btn_alarm_cancel = (TextView) dialog_alarm.findViewById(R.id.btn_alarm_cancel);
+                btn_alarm_save.setOnClickListener(this);
+                btn_alarm_cancel.setOnClickListener(this);
                 break;
 
             case R.id.btn_alarm_cancel:
