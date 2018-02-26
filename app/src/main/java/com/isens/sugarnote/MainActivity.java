@@ -60,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
 
     private Time time;
 
+    private SharedPreferences prefs_root, prefs_user;
+    private SharedPreferences.Editor editor_user;
+
     private FragmentManager fm;
     private FragmentTransaction tran;
 
@@ -68,11 +71,12 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private GoogleApiClient mGoogleApiClient;
     private boolean isAPIConnected;
 
-    private String month, date, calendar_head, time, sugar, mealoption, Kakaostring;
+    private String month, date, calendar_head, s_time, sugar, mealoption, Kakaostring;
     private int today_Month, today_Date, today_Year, cursorSize;
     private Calendar calendar;
     private Cursor cursor;
     private long now;
+    private String userAccount;
     // BGM CB register
 
     private final BloodGlucoseMonitorCallBack _bgm_callBack = new BloodGlucoseMonitorCallBack() {
@@ -297,10 +301,10 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         Kakaostring = calendar_head;
 
         while (cursor.moveToNext()) {
-            time = cursor.getString(1);
+            s_time = cursor.getString(1);
             sugar = String.valueOf(cursor.getInt(2));
             mealoption = cursor.getString(3);
-            Kakaostring = Kakaostring +"\n" + time.substring(14,22) + ",  " + mealoption + ",  " + sugar + "mg/dL";
+            Kakaostring = Kakaostring +"\n" + s_time.substring(14,22) + ",  " + mealoption + ",  " + sugar + "mg/dL";
         }
 
         if (cursorSize == 0)

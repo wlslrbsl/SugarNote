@@ -63,7 +63,7 @@ import static com.github.mikephil.charting.charts.Chart.LOG_TAG;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener, ListView.OnItemClickListener {
+public class HomeFragment extends Fragment implements View.OnClickListener, ListView.OnItemClickListener {
 
     private SharedPreferences prefs_root, prefs_user;
     private SharedPreferences.Editor editor_user;
@@ -120,7 +120,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         view = inflater.inflate(R.layout.fragment_home, container, false);
 
         prefs_root = ac.getSharedPreferences("ROOT", 0);
-        editor_root = prefs_root.edit();
+
         userAccount = prefs_root.getString("SIGNIN", "none");
         prefs_user = ac.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
@@ -145,9 +145,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         btn_navi_right.setBackgroundResource(R.drawable.state_btn_navi_sync);
         btn_navi_right.setEnabled(true);
         btn_navi_left.setEnabled(true);
-
-        btn_navi_left.setOnLongClickListener(this);
-        btn_navi_right.setOnLongClickListener(this);
 
         btn_navi_center.setOnClickListener(this);
         btn_navi_right.setOnClickListener(this);
@@ -200,7 +197,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 dialog_power.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog_power.setContentView(R.layout.dialog_power);
 
-                listview = (ListView)dialog_power.findViewById(R.id.Listview_Power);
+                listview = (ListView) dialog_power.findViewById(R.id.Listview_Power);
                 listview.setAdapter(listviewadapter_power);
 
                 listview.setOnItemClickListener(this);
@@ -215,7 +212,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
 
             case R.id.btn_navi_right:
 
-                if(wifi.isWifiEnabled()) {
+                if (wifi.isWifiEnabled()) {
                     syncFlag = true;
                     dialog_Sync = new Dialog(ac);
                     dialog_Sync.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -263,7 +260,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                     Drive.DriveApi.query(listener.getAPIClient(), query)
                             .setResultCallback(metadataCallback);
 
-                    dialog_Sync.dismiss();
+
                 } else {
                     ac.finish();
                 }
@@ -337,11 +334,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                                     tv_dialog.setText("데이터 동기화가 완료되었습니다.");
                                                     sync_progbar.setVisibility(View.INVISIBLE);
                                                     db.close();
-                                                    new Handler().postDelayed(new Runnable()
-                                                    {
+                                                    new Handler().postDelayed(new Runnable() {
                                                         @Override
-                                                        public void run()
-                                                        {
+                                                        public void run() {
                                                             dialog_Sync.dismiss();
                                                         }
                                                     }, 500);
@@ -375,15 +370,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                     public void onResult(DriveApi.DriveContentsResult result) {
                         if (!result.getStatus().isSuccess()) {
                             int status_code = result.getStatus().getStatusCode();
-                            if (status_code == 1502){
+                            if (status_code == 1502) {
                                 db.getPath();
                                 dbfilepath = db.getPath();
                                 dbfilepath2 = db.getPath();
                                 File dbFile = new File(dbfilepath);
 
                                 saveToDrive(Drive.DriveApi.getRootFolder(listener.getAPIClient()), "GLUCOSEDATA.db", "application/x-sqlite3", dbFile);
-                            }
-                            else {
+                            } else {
                                 showMessage(" ERROR jj ");
                             }
                             return;
@@ -405,7 +399,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                     int read;
 
                                     int download_length = input.available() / buffer.length;
-                                    progress_interval = 40/download_length;
+                                    progress_interval = 40 / download_length;
                                     while ((read = input.read(buffer)) != -1) {
                                         output.write(buffer, 0, read);
                                         progress_val = progress_val + progress_interval;
@@ -483,7 +477,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                 int c;
 
                                 int update_length = is.available() / buf.length;
-                                progress_interval = 40/update_length;
+                                progress_interval = 40 / update_length;
                                 while ((c = is.read(buf, 0, buf.length)) > 0) {
                                     oos.write(buf, 0, c);
                                     oos.flush();
@@ -506,11 +500,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                                     tv_dialog.setText("데이터 동기화가 완료되었습니다.");
                                     sync_progbar.setVisibility(View.INVISIBLE);
                                     db.close();
-                                    new Handler().postDelayed(new Runnable()
-                                    {
+                                    new Handler().postDelayed(new Runnable() {
                                         @Override
-                                        public void run()
-                                        {
+                                        public void run() {
                                             dialog_Sync.dismiss();
                                         }
                                     }, 500);
@@ -577,139 +569,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
         cursor.close();
     }
 
-    public void DB_Create() {
-        String save_date;
-        if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
-        db = dbHelper.getWritableDatabase();
-
-        dbHelper.clear_db();
-
-        if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
-        db = dbHelper.getWritableDatabase();
-
-        long now = System.currentTimeMillis();
-        Date date = new Date(now);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/ MM/ dd, HH:mm:ss");
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-
-        Date caldate = cal.getTime();
-        double ran = Math.random(); // 0< ran<1 사이의 실수
-        int val = (int) (ran * 20);
-        int before_val = val + 90;
-        int after_val = val + 100;
-        int empty_val = val + 110;
-
-        for (int i = 0; i < 40; i++) {
-
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            before_val = val + 90;
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            after_val = val + 100;
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            empty_val = val + 110;
-
-            cal.add(Calendar.DATE, -1);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, empty_val, "공복");
-
-            cal.add(Calendar.SECOND, 5);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, before_val, "식전");
-
-            cal.add(Calendar.SECOND, 5);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, after_val, "식후");
-
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            before_val = val + 90;
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            after_val = val + 100;
-            ran = Math.random(); // 0< ran<1 사이의 실수
-            val = (int) (ran * 20);
-            empty_val = val + 110;
-
-            cal.add(Calendar.SECOND, 5);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, empty_val, "공복");
-
-            cal.add(Calendar.SECOND, 5);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, before_val, "식전");
-
-            cal.add(Calendar.SECOND, 5);
-            caldate = cal.getTime();
-            save_date = simpleDateFormat.format(caldate);
-            dbHelper.insert(save_date, after_val, "식후");
-        }
-
-        db.close();
-
-    }
-
-    @Override
-    public boolean onLongClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_navi_right:
-                dialog_createDB = new Dialog(ac);
-                dialog_createDB.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog_createDB.setContentView(R.layout.dialog_default);
-
-                tv_dialog = (TextView) dialog_createDB.findViewById(R.id.tv_dialog);
-                tv_dialog.setText("혈당 데이터를 생성하시겠습니까?");
-
-                btn_dialog_ok = (TextView) dialog_createDB.findViewById(R.id.btn_dialog_ok);
-                btn_dialog_cancel = (TextView) dialog_createDB.findViewById(R.id.btn_dialog_cancel);
-                btn_dialog_cancel.setText("아니요");
-
-                btn_dialog_ok.setOnClickListener(this);
-                btn_dialog_cancel.setOnClickListener(this);
-
-                createDBFlag = true;
-                dialog_createDB.show();
-                break;
-
-            case R.id.btn_navi_left:
-                dialog_deleteLOG = new Dialog(ac);
-                dialog_deleteLOG.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog_deleteLOG.setContentView(R.layout.dialog_default);
-
-                tv_dialog = (TextView) dialog_deleteLOG.findViewById(R.id.tv_dialog);
-                tv_dialog.setText("로그인된 계정을 삭제하시겠습니까?");
-
-                btn_dialog_ok = (TextView) dialog_deleteLOG.findViewById(R.id.btn_dialog_ok);
-                btn_dialog_cancel = (TextView) dialog_deleteLOG.findViewById(R.id.btn_dialog_cancel);
-                btn_dialog_cancel.setText("아니요");
-
-                btn_dialog_ok.setOnClickListener(this);
-                btn_dialog_cancel.setOnClickListener(this);
-
-                deleteLogFlag = true;
-                dialog_deleteLOG.show();
-                break;
-        }
-        return false;
-    }
-
-
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         dialog_power.dismiss();
 
-        if(i == 0){
+        if (i == 0) {
             showMessage("test");
         }
-        if(i == 1){
+        if (i == 1) {
             try {
                 Process p = Runtime.getRuntime().exec("su");
                 OutputStream os = p.getOutputStream();
@@ -720,23 +587,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener, View
                 ex.printStackTrace();
             }
         }
-        if(i == 2){
+        if (i == 2) {
 
-                dialog_logout = new Dialog(ac);
-                dialog_logout.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog_logout.setContentView(R.layout.dialog_default);
+            dialog_logout = new Dialog(ac);
+            dialog_logout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog_logout.setContentView(R.layout.dialog_default);
 
-                tv_dialog = (TextView) dialog_logout.findViewById(R.id.tv_dialog);
-                tv_dialog.setText("로그인 화면으로 돌아가시겠습니까?");
+            tv_dialog = (TextView) dialog_logout.findViewById(R.id.tv_dialog);
+            tv_dialog.setText("로그인 화면으로 돌아가시겠습니까?");
 
-                btn_dialog_ok = (TextView) dialog_logout.findViewById(R.id.btn_dialog_ok);
-                btn_dialog_cancel = (TextView) dialog_logout.findViewById(R.id.btn_dialog_cancel);
-                btn_dialog_cancel.setText("아니요");
+            btn_dialog_ok = (TextView) dialog_logout.findViewById(R.id.btn_dialog_ok);
+            btn_dialog_cancel = (TextView) dialog_logout.findViewById(R.id.btn_dialog_cancel);
+            btn_dialog_cancel.setText("아니요");
 
-                btn_dialog_ok.setOnClickListener(this);
-                btn_dialog_cancel.setOnClickListener(this);
+            btn_dialog_ok.setOnClickListener(this);
+            btn_dialog_cancel.setOnClickListener(this);
 
-                dialog_logout.show();
+            dialog_logout.show();
         }
     }
 }
