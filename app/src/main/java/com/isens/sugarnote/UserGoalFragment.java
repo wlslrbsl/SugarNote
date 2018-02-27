@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 
 /**
@@ -27,7 +26,7 @@ public class UserGoalFragment extends Fragment implements View.OnClickListener{
 
     private FragmentInterActionListener listener;
 
-    private RangeSeekBar rangeSeekBarPremeal, rangeSeekBarPostmeal, rangeSeekNomeal;
+    private RangeSeekBar<Integer> rangeSeekBarPremeal, rangeSeekBarPostmeal, rangeSeekBarNomeal;
     private LinearLayout ll_seekbar_premeal, ll_seekbar_postmeal, ll_seekbar_nomeal;
 
     private Button btn_navi_center, btn_navi_left, btn_navi_right;
@@ -80,31 +79,38 @@ public class UserGoalFragment extends Fragment implements View.OnClickListener{
         rangeSeekBarPremeal = new RangeSeekBar<Integer>(ac);
 
         rangeSeekBarPremeal.setRangeValues(0, 200);
-        rangeSeekBarPremeal.setSelectedMaxValue(prefs_user.getInt("PREMAX",100));
-        rangeSeekBarPremeal.setSelectedMinValue(prefs_user.getInt("PREMIN",50));
+        rangeSeekBarPremeal.setSelectedMaxValue(prefs_user.getInt("PREHIGH",100));
+        rangeSeekBarPremeal.setSelectedMinValue(prefs_user.getInt("PRELOW",50));
 
         rangeSeekBarPostmeal = new RangeSeekBar<Integer>(ac);
 
         rangeSeekBarPostmeal.setRangeValues(0, 200);
-        rangeSeekBarPostmeal.setSelectedMaxValue(prefs_user.getInt("POSTMAX",150));
-        rangeSeekBarPostmeal.setSelectedMinValue(prefs_user.getInt("POSTMIN",100));
+        rangeSeekBarPostmeal.setSelectedMaxValue(prefs_user.getInt("POSTHIGH",150));
+        rangeSeekBarPostmeal.setSelectedMinValue(prefs_user.getInt("POSTLOW",100));
 
-        rangeSeekNomeal = new RangeSeekBar<Integer>(ac);
+        rangeSeekBarNomeal = new RangeSeekBar<Integer>(ac);
 
-        rangeSeekNomeal.setRangeValues(0, 200);
-        rangeSeekNomeal.setSelectedMaxValue(prefs_user.getInt("NOMAX",125));
-        rangeSeekNomeal.setSelectedMinValue(prefs_user.getInt("NOMIN",75));
+        rangeSeekBarNomeal.setRangeValues(0, 200);
+        rangeSeekBarNomeal.setSelectedMaxValue(prefs_user.getInt("NOHIGH",125));
+        rangeSeekBarNomeal.setSelectedMinValue(prefs_user.getInt("NOLOW",75));
 
         ll_seekbar_premeal.addView(rangeSeekBarPremeal);
         ll_seekbar_postmeal.addView(rangeSeekBarPostmeal);
-        ll_seekbar_nomeal.addView(rangeSeekNomeal);
+        ll_seekbar_nomeal.addView(rangeSeekBarNomeal);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_navi_center :
-                listener.setFrag("USER");
+                editor_user.putInt("PRELOW", rangeSeekBarPremeal.getSelectedMinValue());
+                editor_user.putInt("PREHIGH", rangeSeekBarPremeal.getSelectedMaxValue());
+                editor_user.putInt("POSTLOW", rangeSeekBarPostmeal.getSelectedMinValue());
+                editor_user.putInt("POSTHIGH", rangeSeekBarPostmeal.getSelectedMaxValue());
+                editor_user.putInt("NOLOW", rangeSeekBarNomeal.getSelectedMinValue());
+                editor_user.putInt("NOHIGH", rangeSeekBarNomeal.getSelectedMaxValue());
+                editor_user.commit();
+                listener.setFrag("HOME");
                 break;
             case R.id.btn_navi_left :
                 listener.setFrag("HOME");
