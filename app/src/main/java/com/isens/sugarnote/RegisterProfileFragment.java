@@ -51,7 +51,7 @@ public class RegisterProfileFragment extends Fragment implements AnimatorSet.Ani
         super.onCreate(savedInstanceState);
         mContext = getContext();
         prefs_root = mContext.getSharedPreferences("ROOT", 0);
-        userAccount = prefs_root.getString("SIGNIN","ERROR");
+        userAccount = prefs_root.getString("SIGNIN", "ERROR");
         prefs_user = mContext.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
     }
@@ -165,7 +165,7 @@ public class RegisterProfileFragment extends Fragment implements AnimatorSet.Ani
     public void afterTextChanged(Editable editable) {
         if (edt_profile_name.getText().toString().equals("") | edt_profile_birth_year.getText().toString().equals("") |
                 edt_profile_birth_month.getText().toString().equals("") | edt_profile_birth_day.getText().toString().equals("")) {
-            if(!MyApplication.isRegisterDebugMode())
+            if (!MyApplication.isRegisterDebugMode())
                 btn_next_register.setEnabled(false);
         } else {
             btn_next_register.setEnabled(true);
@@ -191,13 +191,38 @@ public class RegisterProfileFragment extends Fragment implements AnimatorSet.Ani
                 break;
             case R.id.btn_next_register:
                 userName = edt_profile_name.getText().toString();
-                userBirth = edt_profile_birth_year.getText().toString() + edt_profile_birth_month.getText().toString() + edt_profile_birth_day.getText().toString();
-                editor_user.putString("NAME", userName);
-                editor_user.putString("BIRTH", userBirth);
-                editor_user.putString("GENDER", userGender);
-                editor_user.commit();
-                fadeOutLinearLayout.start();
-                break;
+
+                int year, month, date;
+
+                if (MyApplication.isRegisterDebugMode()) {
+                    edt_profile_birth_day.setText("16");
+                    edt_profile_birth_month.setText("5");
+                    edt_profile_birth_year.setText("1991");
+                }
+
+                year = Integer.valueOf(edt_profile_birth_year.getText().toString());
+                month = Integer.valueOf(edt_profile_birth_month.getText().toString());
+                date = Integer.valueOf(edt_profile_birth_day.getText().toString());
+
+                String s_year = edt_profile_birth_year.getText().toString();
+                String s_month, s_date;
+                s_month = (month < 10) ? "0" + edt_profile_birth_month.getText().toString() : edt_profile_birth_month.getText().toString();
+                s_date = (date < 10) ? "0" + edt_profile_birth_day.getText().toString() : edt_profile_birth_day.getText().toString();
+
+                userBirth = s_year + s_month + s_date;
+
+                Time time = new Time();
+                if (1900 < year && year < time.getYear_now() && month < 13 && date < 32) {
+                    editor_user.putString("NAME", userName);
+                    editor_user.putString("BIRTH", userBirth);
+                    editor_user.putString("GENDER", userGender);
+                    editor_user.commit();
+                    fadeOutLinearLayout.start();
+                    break;
+                } else {
+                    Toast.makeText(mContext, "생년월일을 다시 확인하세요.", Toast.LENGTH_SHORT).show();
+                    break;
+                }
             default:
                 break;
         }

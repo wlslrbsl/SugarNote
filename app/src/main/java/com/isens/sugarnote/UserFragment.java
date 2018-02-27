@@ -122,18 +122,34 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                 }
                 userName = edt_profile_name.getText().toString();
                 userBirth = edt_profile_birth_year.getText().toString() + edt_profile_birth_month.getText().toString() + edt_profile_birth_day.getText().toString();
-                userHeight = edt_height.getText().toString();
-                userWeight = edt_weight.getText().toString();
-                editor_user.putString("NAME", userName);
-                editor_user.putString("BIRTH", userBirth);
-                editor_user.putString("HEIGHT", userHeight);
-                editor_user.putString("WEIGHT", userWeight);
-                editor_user.putString("GENDER", userGender);
-                editor_user.commit();
-                Toast.makeText(ac, "세이브", Toast.LENGTH_SHORT).show();
-                listener.setFrag("HOME");
-                break;
 
+                int year = Integer.valueOf(edt_profile_birth_year.getText().toString());
+                int month = Integer.valueOf(edt_profile_birth_month.getText().toString());
+                int date = Integer.valueOf(edt_profile_birth_day.getText().toString());
+
+                String s_year = edt_profile_birth_year.getText().toString();
+                String s_month, s_date;
+                s_month = (month < 10) ? "0" + edt_profile_birth_month.getText().toString() : edt_profile_birth_month.getText().toString();
+                s_date = (month < 10) ? "0" + edt_profile_birth_day.getText().toString() : edt_profile_birth_day.getText().toString();
+
+                userBirth = s_year + s_month + s_date;
+
+                Time time = new Time();
+                if (1900 < year && year < time.getYear_now() && month < 13 && date < 32) {
+                    userHeight = edt_height.getText().toString();
+                    userWeight = edt_weight.getText().toString();
+                    editor_user.putString("NAME", userName);
+                    editor_user.putString("BIRTH", userBirth);
+                    editor_user.putString("HEIGHT", userHeight);
+                    editor_user.putString("WEIGHT", userWeight);
+                    editor_user.putString("GENDER", userGender);
+                    editor_user.commit();
+                    listener.setFrag("HOME");
+                    break;
+                } else {
+                    Toast.makeText(ac, "생년월일을 다시 확인하세요.", Toast.LENGTH_SHORT).show();
+                    break;
+                }
             case R.id.btn_navi_left:
                 listener.setFrag("HOME");
                 break;

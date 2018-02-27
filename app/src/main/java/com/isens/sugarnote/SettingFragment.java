@@ -213,7 +213,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
                 dialog_initLog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog_initLog.setContentView(R.layout.dialog_default);
 
-                tv_dialog = (TextView) dialog_deleteLOG.findViewById(R.id.tv_dialog);
+                tv_dialog = (TextView) dialog_initLog.findViewById(R.id.tv_dialog);
                 tv_dialog.setText("계정을 초기화 하시겠습니까?");
 
                 btn_dialog_ok = (TextView) dialog_deleteLOG.findViewById(R.id.btn_dialog_ok);
@@ -234,7 +234,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
                     deleteLogFlag = false;
                     ac.finish();
                 } else if (initLogFlag) {
-                    initLogFlag = true;
+                    initLogFlag = false;
+                    Toast.makeText(ac, "미구현", Toast.LENGTH_SHORT).show();
                 } else if (emptyDBFLag) {
                     DB_Create();
                     emptyDBFLag = false;

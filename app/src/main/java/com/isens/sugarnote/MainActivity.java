@@ -108,8 +108,6 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
                             }
                         }
                     }
-
-
         }
 
         @Override

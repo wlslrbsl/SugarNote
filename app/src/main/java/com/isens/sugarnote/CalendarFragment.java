@@ -314,8 +314,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             recyclerViewAdapter.addItem(time.substring(14, 19), mealoption, String.valueOf(sugar));
         }
 
-        if (cursorSize == 0)
-            Toast.makeText(ac, "No Data", Toast.LENGTH_SHORT).show();
+        Toast.makeText(ac, String.valueOf(cursorSize), Toast.LENGTH_SHORT).show();
+
+        if (cursorSize == 0);
+
 
         recycler_view.setAdapter(recyclerViewAdapter);
     }
