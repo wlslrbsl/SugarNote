@@ -6,7 +6,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Vibrator;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +31,7 @@ import java.util.Date;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SettingFragment extends Fragment implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, CompoundButton.OnCheckedChangeListener {
+public class SettingFragment extends Fragment implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     private Activity ac;
     private View view;
@@ -36,7 +40,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
     private SharedPreferences.Editor editor_user;
 
     private Dialog dialog_deleteLOG, dialog_DBset, dialog_initLog;
-
+    private SoundPool soundpool;
+    private int tak;
     private SeekBar bright_sb;
     private Switch sw_setting_sound, sw_setting_vibe;
     private FragmentInterActionListener listener;
@@ -50,6 +55,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
     private String userAccount, querry;
     private int cursorSize;
     private boolean deleteLogFlag = false, emptyDBFLag = false, initLogFlag;
+    private float brightness_val;
 
     public SettingFragment() {
         // Required empty public constructor
@@ -77,14 +83,16 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
         sw_setting_sound = (Switch) view.findViewById(R.id.sw_setting_sound);
         sw_setting_vibe = (Switch) view.findViewById(R.id.sw_setting_vibe);
 
+        brightness_val = prefs_user.getFloat("BRIGHTNESS",100);
+
         WindowManager.LayoutParams params = ac.getWindow().getAttributes();
-        params.screenBrightness = ac.getWindow().getAttributes().screenBrightness;
-        float init_progress = params.screenBrightness * 100;
-        bright_sb.setProgress((int) init_progress);
+        params.screenBrightness = (float) brightness_val / 100;
+        ac.getWindow().setAttributes(params);
+        bright_sb.setProgress((int) brightness_val);
 
         bright_sb.setOnSeekBarChangeListener(this);
-        sw_setting_sound.setOnCheckedChangeListener(this);
-        sw_setting_vibe.setOnCheckedChangeListener(this);
+        sw_setting_sound.setOnClickListener(this);
+        sw_setting_vibe.setOnClickListener(this);
 
         btn_navi_center = (Button) ac.findViewById(R.id.btn_navi_center);
         btn_navi_right = (Button) ac.findViewById(R.id.btn_navi_right);
@@ -123,6 +131,21 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
             emptyDBFLag = false;
             btn_db_state_set.setText("DB삭제");
         }
+
+        soundpool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+        tak = soundpool.load(ac, R.raw.beep, 1);
+
+        if(prefs_user.getBoolean("VIBE",true))
+            sw_setting_vibe.setChecked(true);
+        else
+            sw_setting_vibe.setChecked(false);
+
+        if(prefs_user.getBoolean("SOUND",true))
+            sw_setting_sound.setChecked(true);
+        else
+            sw_setting_sound.setChecked(false);
+
+
         return view;
     }
 
@@ -228,6 +251,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
                 break;
 
             case R.id.btn_navi_center:
+                editor_user.putFloat("BRIGHTNESS",brightness_val);
+                editor_user.commit();
                 listener.setFrag("HOME");
                 break;
 
@@ -245,6 +270,29 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
                 dialog.show();
                 break;
 
+            case R.id.sw_setting_sound:
+                if(sw_setting_sound.isChecked()) {
+                    editor_user.putBoolean("SOUND",true);
+                    soundpool.play(tak, 1, 1, 0, 0, 1);
+                }
+                else
+                    editor_user.putBoolean("SOUND",false);
+
+                editor_user.commit();
+                break;
+
+            case R.id.sw_setting_vibe:
+                if(sw_setting_vibe.isChecked()){
+                    editor_user.putBoolean("VIBE",true);
+                    Vibrator vibrator = (Vibrator) ac.getSystemService(Context.VIBRATOR_SERVICE);
+                    vibrator.vibrate(500);
+                }
+                else
+                    editor_user.putBoolean("VIBE",false);
+
+                editor_user.commit();
+                break;
+
             default:
                 break;
         }
@@ -253,17 +301,15 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-        int brightness;
-
         if (progress < 10) {
-            brightness = 10;
+            brightness_val = 10;
             //bright_sb.setProgress(progress);
         } else {
-            brightness = progress;
+            brightness_val = progress;
         }
 
         WindowManager.LayoutParams params = ac.getWindow().getAttributes();
-        params.screenBrightness = (float) brightness / 100;
+        params.screenBrightness = (float) brightness_val / 100;
         ac.getWindow().setAttributes(params);
 
     }
@@ -276,13 +322,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        switch (buttonView.getId()) {
-
-        }
     }
 
     public void DB_Create() {

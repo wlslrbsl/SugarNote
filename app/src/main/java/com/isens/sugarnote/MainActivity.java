@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -84,8 +85,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         public void bgmcallBackMethod(String str, int status, int value) {
 
             if (status == BloodGlucoseMonitor.BGM_STATUS_INSERT_STRIP) {
-                MyApplication.setIsStrip(true);
-                setFrag("MEASURE");
+                        MyApplication.setIsStrip(true);
+                        setFrag("MEASURE");
             }
         }
 
@@ -218,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
             case "MEASURE":
                 tran.replace(R.id.fragment_container_main, measureFragment);
                 tran.commit();
+
                 break;
             case "STATISTICS":
                 tran.replace(R.id.fragment_container_main, reportStatisticsFragment);

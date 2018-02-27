@@ -3,6 +3,7 @@ package com.isens.sugarnote;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -45,6 +47,7 @@ import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -67,16 +70,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
 
     private SharedPreferences prefs_root, prefs_user;
     private SharedPreferences.Editor editor_user;
-
     private Activity ac;
     private View view;
-
     private CustomAdapterSetting listviewadapter_power;
-
     private ListView listview;
-
     private Dialog dialog_logout, dialog_createDB, dialog_deleteLOG, dialog_Sync, dialog_power;
-
     private WifiManager wifi;
     private FragmentInterActionListener listener;
     private int progress_interval;
@@ -84,22 +82,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
     private Button btn_navi_right, btn_navi_center, btn_navi_left;
     private ProgressBar sync_progbar;
     private TextView tv_dialog, btn_dialog_ok, btn_dialog_cancel;
-
     private String userAccount;
-
     private DBHelper dbHelper, dbHelper2;
     private SQLiteDatabase db, db2;
     private int progress_val = 0;
     private boolean download_complete = false;
     private boolean createDBFlag = false;
     private boolean deleteLogFlag = false;
-    private boolean syncFlag = false;
+    private boolean syncFlag = false, sync_prog_flag = false;
     private Handler handler = new Handler(); // Thread 에서 화면에 그리기 위해서 필요
-
+    private float brightness_val;
     private String dbfilepath;
     private static String dbfilepath2;
     public DriveId mDriveId;
-
     private static Drive service;
 
     public HomeFragment() {
@@ -115,15 +110,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         ac = getActivity();
         view = inflater.inflate(R.layout.fragment_home, container, false);
-
         prefs_root = ac.getSharedPreferences("ROOT", 0);
-
         userAccount = prefs_root.getString("SIGNIN", "none");
         prefs_user = ac.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
+        brightness_val = prefs_user.getFloat("BRIGHTNESS",100);
+        WindowManager.LayoutParams params = ac.getWindow().getAttributes();
+        params.screenBrightness = (float) brightness_val / 100;
+        ac.getWindow().setAttributes(params);
 
         listviewadapter_power = new CustomAdapterSetting(ac);
         listviewadapter_power.addItem("전원 끄기");
@@ -157,7 +153,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
 
         wifi = (WifiManager) ac.getApplicationContext().getSystemService(ac.WIFI_SERVICE);
 
-        // Inflate the layout for this fragment
         return view;
     }
 
@@ -193,17 +188,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
                 tv_dialog = (TextView) dialog_logout.findViewById(R.id.tv_dialog);
                 tv_dialog.setText("로그인 화면으로 돌아가시겠습니까?");
 
-                dialog_power = new Dialog(ac);
-                dialog_power.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog_power.setContentView(R.layout.dialog_power);
+                btn_dialog_ok = (TextView) dialog_logout.findViewById(R.id.btn_dialog_ok);
+                btn_dialog_cancel = (TextView) dialog_logout.findViewById(R.id.btn_dialog_cancel);
+                btn_dialog_cancel.setText("아니요");
 
-                listview = (ListView) dialog_power.findViewById(R.id.Listview_Power);
-                listview.setAdapter(listviewadapter_power);
+                btn_dialog_ok.setOnClickListener(this);
+                btn_dialog_cancel.setOnClickListener(this);
 
-                listview.setOnItemClickListener(this);
+                dialog_logout.show();
 
-                dialog_power.show();
-
+//                dialog_power = new Dialog(ac);
+//                dialog_power.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//                dialog_power.setContentView(R.layout.dialog_power);
+//
+//                listview = (ListView) dialog_power.findViewById(R.id.Listview_Power);
+//                listview.setAdapter(listviewadapter_power);
+//                listview.setOnItemClickListener(this);
+//
+//                dialog_power.show();
                 break;
 
             case R.id.btn_navi_left:
@@ -217,6 +219,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
                     dialog_Sync = new Dialog(ac);
                     dialog_Sync.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     dialog_Sync.setContentView(R.layout.dialog_default);
+                    dialog_Sync.setCanceledOnTouchOutside(false);
 
                     tv_dialog = (TextView) dialog_Sync.findViewById(R.id.tv_dialog);
                     tv_dialog.setText("구글 드라이브 데이터 동기화를\n진행하시겠습니까?");
@@ -229,16 +232,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
                     btn_dialog_cancel.setOnClickListener(this);
 
                     dialog_Sync.show();
-
                 } else {
-
                     WifiDialog dialog = new WifiDialog(ac);
                     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     dialog.setContentView(R.layout.dialog_wifi);
                     dialog.show();
-
                 }
-
                 break;
 
             case R.id.btn_dialog_ok:
@@ -248,7 +247,26 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
                     tv_dialog.setText("구글 드라이브 데이터 동기화중...");
                     btn_dialog_ok.setVisibility(View.INVISIBLE);
                     btn_dialog_cancel.setVisibility(View.INVISIBLE);
-                    sync_progbar.setVisibility(View.VISIBLE);
+
+
+                    sync_prog_flag = true;
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() { // Thread 로 작업할 내용을 구현
+                            while(sync_prog_flag) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() { // 화면에 변경하는 작업을 구현
+                                        sync_progbar.setVisibility(View.VISIBLE);
+                                    }
+                                });
+                                try {
+                                    Thread.sleep(500); // 시간지연
+                                } catch (InterruptedException e) {    }
+                            } // end of while
+                        }
+                    });
+                    t.start(); // 쓰레드 시작
 
                     listener.connectAPIClient();
 
@@ -259,8 +277,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
 
                     Drive.DriveApi.query(listener.getAPIClient(), query)
                             .setResultCallback(metadataCallback);
-
-
                 } else {
                     ac.finish();
                 }
@@ -334,6 +350,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
                                                     tv_dialog.setText("데이터 동기화가 완료되었습니다.");
                                                     sync_progbar.setVisibility(View.INVISIBLE);
                                                     db.close();
+                                                    sync_prog_flag = false;
                                                     new Handler().postDelayed(new Runnable() {
                                                         @Override
                                                         public void run() {
@@ -382,7 +399,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
                             }
                             return;
                         }
-
                         // DriveContents object contains pointers
                         // to the actual byte stream
                         DriveContents contents = result.getDriveContents();
@@ -432,7 +448,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
                                     File mdbFile = new File(dbfilepath);
                                     mdbFile.delete();
                                 }
-
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -500,6 +515,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
                                     tv_dialog.setText("데이터 동기화가 완료되었습니다.");
                                     sync_progbar.setVisibility(View.INVISIBLE);
                                     db.close();
+                                    sync_prog_flag = false;
                                     new Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
@@ -578,13 +594,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
         }
         if (i == 1) {
             try {
-                Process p = Runtime.getRuntime().exec("su");
-                OutputStream os = p.getOutputStream();
-                os.write("reboot -p\n".getBytes());
-                os.flush();
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                Runtime.getRuntime().exec(new String[]{"/system/bin/su","-c","reboot now"});
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         if (i == 2) {
@@ -606,4 +618,5 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
             dialog_logout.show();
         }
     }
+
 }

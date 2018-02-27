@@ -179,9 +179,6 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
         txt_postmeal_count.setText(String.format("%.1f",postmeal_count_val_round));
         txt_nomeal_count.setText(String.format("%.1f",nomeal_count_val_round));
 
-        mProgress_count.setProgress((int)premeal_count_portion_int);
-        mProgress_count.setSecondaryProgress((int)postmeal_count_portion_int);
-
         txt_premeal_mean.setText(Integer.toString(premeal_mean_val));
         txt_postmeal_mean.setText(Integer.toString(postmeal_mean_val));
         txt_nomeal_mean.setText(Integer.toString(nomeal_mean_val));
@@ -207,11 +204,11 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
 
         max_mValue = Collections.max(list);
 
-
-
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() { // Thread 로 작업할 내용을 구현
+                mProgress_count.setProgress((int)premeal_count_portion_int);
+                mProgress_count.setSecondaryProgress((int)postmeal_count_portion_int);
                 while(value <= max_mValue) {
                     value = value + 1;
 
