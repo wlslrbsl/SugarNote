@@ -152,6 +152,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         return view;
     }
 
+
     public boolean isExistdata(String meal) {
 
         String query;

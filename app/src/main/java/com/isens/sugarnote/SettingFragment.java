@@ -361,6 +361,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
         int after_val = val + 100;
         int empty_val = val + 110;
 
+        cal.add(Calendar.DATE, +1);
+
         for (int i = 0; i < 40; i++) {
 
             ran = Math.random(); // 0< ran<1 사이의 실수

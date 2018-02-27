@@ -12,6 +12,7 @@ import android.content.pm.Signature;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -83,16 +84,32 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private Cursor cursor;
     private long now;
     private String userAccount;
+    private boolean ready_flag = false, repeat_flag = false;
+    private int status_bgm;
     // BGM CB register
 
     private final BloodGlucoseMonitorCallBack _bgm_callBack = new BloodGlucoseMonitorCallBack() {
         @Override
         public void bgmcallBackMethod(String str, int status, int value) {
+            status_bgm = status;
 
-            if (status == BloodGlucoseMonitor.BGM_STATUS_INSERT_STRIP) {
-                        MyApplication.setIsStrip(true);
-                        setFrag("MEASURE");
-            }
+
+                    if (status_bgm == BloodGlucoseMonitor.BGM_STATUS_INSERT_STRIP) {
+                        repeat_flag = true;
+                        while(repeat_flag) {
+                            if (ready_flag) {
+                                repeat_flag = false;
+                                MyApplication.setIsStrip(true);
+                                setFrag("MEASURE");
+                            }
+                            if (status_bgm != BloodGlucoseMonitor.BGM_STATUS_INSERT_STRIP) {
+                                MyApplication.setIsStrip(false);
+                                repeat_flag = false;
+                            }
+                        }
+                    }
+
+
         }
 
         @Override
@@ -204,7 +221,29 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         }
     };
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ready_flag = false;
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ready_flag = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        ready_flag = false;
+    }
 
     @Override
     public void setFrag(String state) {
