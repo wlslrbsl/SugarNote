@@ -58,7 +58,6 @@
                                 android:id="@+id/tv_calendar_date"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="20"
                                 android:textColor="@color/color_dark_gray"
                                 android:textSize="45sp"
                                 android:textStyle="bold" />
@@ -68,7 +67,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="5dp"
-                                android:text="(월)"
                                 android:textSize="25sp" />
 
                         </LinearLayout>
@@ -77,9 +75,8 @@
                             android:id="@+id/tv_calendar_month"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="2018. 02."
                             android:textColor="@color/color_dark_gray"
-                            android:textSize="20sp"
+                            android:textSize="15sp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -98,13 +95,48 @@
 
                     </LinearLayout>
 
-
                 </LinearLayout>
 
                 <LinearLayout
+                    android:layout_marginTop="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:orientation="horizontal"
                     android:layout_weight="3">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="40dp"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:gravity="center"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:text="식\n전"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"/>
+
+                        <TextView
+                            android:gravity="center"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:text="식\n후"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"/>
+
+                        <TextView
+                            android:gravity="center"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:text="공\n복"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"/>
+
+                    </LinearLayout>
 
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/recycler_view"

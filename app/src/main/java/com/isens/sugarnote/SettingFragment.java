@@ -82,6 +82,20 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
         float init_progress = params.screenBrightness * 100;
         bright_sb.setProgress((int) init_progress);
 
+        /*int brightness;
+
+        if (progress < 10) {
+            brightness = 10;
+        } else {
+            brightness = progress;
+        }
+
+        WindowManager.LayoutParams params = ac.getWindow().getAttributes();
+        params.screenBrightness = (float) brightness / 100;
+        ac.getWindow().setAttributes(params);*/
+
+
+
         bright_sb.setOnSeekBarChangeListener(this);
         sw_setting_sound.setOnCheckedChangeListener(this);
         sw_setting_vibe.setOnCheckedChangeListener(this);
@@ -257,7 +271,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
 
         if (progress < 10) {
             brightness = 10;
-            //bright_sb.setProgress(progress);
         } else {
             brightness = progress;
         }

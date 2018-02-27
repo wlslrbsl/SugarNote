@@ -43,8 +43,7 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
     private View view;
 
     private FragmentInterActionListener listener;
-    private SharedPreferences.Editor editor;
-    private SharedPreferences prefs;
+    private SharedPreferences prefs_root, prefs_user;
 
     private ImageView iv_meaure_status;
     private LinearLayout LL_measure_result, LL_mealoption;
@@ -68,6 +67,7 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
     private Handler _handler;
     private DBHelper dbHelper;
 
+    private String userAccount;
     private int _bgm_value = 0;
     private int _bgm_status = 0;
     private int cnt =0;
@@ -117,9 +117,9 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
         ac = getActivity();
         view = inflater.inflate(R.layout.fragment_measure, container, false);
 
-        prefs = ac.getSharedPreferences("PrefName", 0);
-        editor = prefs.edit();
-
+        prefs_root = ac.getSharedPreferences("ROOT", 0);
+        userAccount = prefs_root.getString("SIGNIN", "none");
+        prefs_user = ac.getSharedPreferences(userAccount, 0);
 
         _progress_bar = (ProgressBar) view.findViewById(R.id.circle_progress);
         progressbar_result = (ProgressBar) view.findViewById(R.id.Progressbar_result);
@@ -426,13 +426,13 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
 
                 _glucose_value = value;
                 meal_option = "식전";
-                /*목표치*/
-                ll_max_premeal = Integer.valueOf(prefs.getString("KEY_BEFORE_MAX", "100"));
-                ll_min_premeal = Integer.valueOf(prefs.getString("KEY_BEFORE_MIN", "80"));
-                ll_max_postmeal = Integer.valueOf(prefs.getString("KEY_AFTER_MAX", "120"));
-                ll_min_postmeal = Integer.valueOf(prefs.getString("KEY_AFTER_MIN", "100"));
-                ll_max_nomeal = Integer.valueOf(prefs.getString("KEY_EMPTY_MAX", "300"));
-                ll_min_nomeal = Integer.valueOf(prefs.getString("KEY_EMPTY_MIN", "90"));
+
+                ll_max_premeal = prefs_user.getInt("PREHIGH",100);
+                ll_min_premeal = prefs_user.getInt("PRELOW",50);
+                ll_max_postmeal = prefs_user.getInt("POSTHIGH",150);
+                ll_min_postmeal = prefs_user.getInt("POSTLOW",100);
+                ll_max_nomeal = prefs_user.getInt("NOHIGH",125);
+                ll_min_nomeal = prefs_user.getInt("NOLOW",75);
 
                 set_result_progress(premeal);
 

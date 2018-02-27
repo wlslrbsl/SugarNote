@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
     private SharedPreferences prefs_root, prefs_user;
@@ -27,7 +26,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
 
     public RecyclerViewAdapter(Context context) {
         this.context = context;
-
         prefs_root = context.getSharedPreferences("ROOT", 0);
         userAccount = prefs_root.getString("SIGNIN", "none");
         prefs_user = context.getSharedPreferences(userAccount, 0);
@@ -36,18 +34,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
 
     @Override
     public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        view = LayoutInflater.from(context).inflate(R.layout.recyclerview_custom, parent, false);
+        view = LayoutInflater.from(context).inflate(R.layout.recyclerview_custom2, parent, false);
         viewHolder = new RecyclerViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
-        holder.recycler_time.setText(time[position]);
+        /*holder.recycler_time.setText(time[position]);
         holder.recycler_mealoption.setText(mealoption[position]);
-        holder.recycler_sugar.setText(sugar[position]);
+        holder.recycler_sugar.setText(sugar[position]);*/
 
-        switch (mealoption[position]) {
+        /*switch (mealoption[position]) {
             case "식전" :
                 if(prefs_user.getInt("PRELOW",50) <= Integer.parseInt(sugar[position]) && Integer.parseInt(sugar[position]) <= prefs_user.getInt("PREHIGH",100))
                     holder.recycler_tag.setBackgroundColor(context.getResources().getColor(android.R.color.holo_green_light));
@@ -65,6 +63,42 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
                     holder.recycler_tag.setBackgroundColor(context.getResources().getColor(android.R.color.holo_green_light));
                 else
                     holder.recycler_tag.setBackgroundColor(context.getResources().getColor(android.R.color.holo_red_light));
+                break;
+        }*/
+
+        switch (mealoption[position]) {
+            case "식전":
+                holder.ll_recycler_premeal.setBackgroundResource(R.drawable.border);
+                holder.tv_premeal_sugar.setText(sugar[position]);
+                holder.tv_premeal_date.setText(time[position]);
+                holder.iv_postmeal_empty.setBackgroundResource(R.drawable.bg_recycler_empty);
+                holder.iv_nomeal_empty.setBackgroundResource(R.drawable.bg_recycler_empty);
+                if (prefs_user.getInt("PRELOW", 50) <= Integer.parseInt(sugar[position]) && Integer.parseInt(sugar[position]) <= prefs_user.getInt("PREHIGH", 100))
+                    holder.tv_premeal_sugar.setBackgroundColor(context.getResources().getColor(android.R.color.holo_green_light));
+                else
+                    holder.tv_premeal_sugar.setBackgroundColor(context.getResources().getColor(android.R.color.holo_red_light));
+                break;
+            case "식후":
+                holder.ll_recycler_postmeal.setBackgroundResource(R.drawable.border);
+                holder.tv_postmeal_sugar.setText(sugar[position]);
+                holder.tv_postmeal_date.setText(time[position]);
+                holder.iv_premeal_empty.setBackgroundResource(R.drawable.bg_recycler_empty);
+                holder.iv_nomeal_empty.setBackgroundResource(R.drawable.bg_recycler_empty);
+                if (prefs_user.getInt("POSTLOW", 100) <= Integer.parseInt(sugar[position]) && Integer.parseInt(sugar[position]) <= prefs_user.getInt("POSTHIGH", 150))
+                    holder.tv_postmeal_sugar.setBackgroundColor(context.getResources().getColor(android.R.color.holo_green_light));
+                else
+                    holder.tv_postmeal_sugar.setBackgroundColor(context.getResources().getColor(android.R.color.holo_red_light));
+                break;
+            case "공복":
+                holder.ll_recycler_nomeal.setBackgroundResource(R.drawable.border);
+                holder.tv_nomeal_sugar.setText(sugar[position]);
+                holder.tv_nomeal_date.setText(time[position]);
+                holder.iv_premeal_empty.setBackgroundResource(R.drawable.bg_recycler_empty);
+                holder.iv_postmeal_empty.setBackgroundResource(R.drawable.bg_recycler_empty);
+                if (prefs_user.getInt("NOLOW", 75) <= Integer.parseInt(sugar[position]) && Integer.parseInt(sugar[position]) <= prefs_user.getInt("NOHIGH", 125))
+                    holder.tv_nomeal_sugar.setBackgroundColor(context.getResources().getColor(android.R.color.holo_green_light));
+                else
+                    holder.tv_nomeal_sugar.setBackgroundColor(context.getResources().getColor(android.R.color.holo_red_light));
                 break;
         }
     }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -112,7 +113,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         btn_navi_right.setEnabled(true);
 
         linearLayoutManager = new LinearLayoutManager(ac);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
 
         recycler_view.setLayoutManager(linearLayoutManager);
 
@@ -310,7 +311,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         while (cursor.moveToNext()) {
             read_glucosedb(cursor);
-            recyclerViewAdapter.addItem(time.substring(14, 22), mealoption, String.valueOf(sugar));
+            recyclerViewAdapter.addItem(time.substring(14, 19), mealoption, String.valueOf(sugar));
         }
 
         if (cursorSize == 0)

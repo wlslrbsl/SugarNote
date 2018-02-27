@@ -1,5 +1,6 @@
 package com.isens.sugarnote;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +20,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -59,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private AlarmFragment alarmFragment;
 
     private Time time;
+    private Dialog dialog_back;
 
     private SharedPreferences prefs_root, prefs_user;
     private SharedPreferences.Editor editor_user;
@@ -387,5 +392,37 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         } catch (IntentSender.SendIntentException e) {
             Log.e("JJ", "Exception while starting resolution activity", e);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        dialog_back = new Dialog(this);
+        dialog_back.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog_back.setContentView(R.layout.dialog_default);
+
+        TextView tv_dialog = (TextView) dialog_back.findViewById(R.id.tv_dialog);
+        TextView btn_dialog_cancel = (TextView) dialog_back.findViewById(R.id.btn_dialog_cancel);
+        TextView btn_dialog_ok = (TextView) dialog_back.findViewById(R.id.btn_dialog_ok);
+
+        tv_dialog.setText("로그인 화면으로 돌아가시겠습니까?");
+        btn_dialog_cancel.setText("아니오");
+
+        btn_dialog_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog_back.dismiss();
+            }
+        });
+
+        btn_dialog_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog_back.dismiss();
+                finish();
+            }
+        });
+
+        dialog_back.show();
     }
 }
