@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:layout_height="80dp"
     android:layout_margin="5dp"
-    android:layout_height="80dp">
+    android:background="@drawable/state_btn_gray_square">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -37,6 +38,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="식전"
+            android:textColor="@android:color/white"
             android:textSize="35sp"
             android:textStyle="bold" />
 
@@ -49,6 +51,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="100"
+            android:textColor="@android:color/white"
             android:textSize="40sp"
             android:textStyle="bold" />
 
@@ -64,6 +67,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:text="15:44:01"
+                android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -74,6 +78,7 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:text="mg/dL"
+                android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 

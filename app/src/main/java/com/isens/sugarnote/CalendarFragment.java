@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     private GridView gv_calendar;
     private TextView tv_drawer_month, tv_drawer_year, tv_calendar_date, tv_calendar_month, tv_calendar_day;
+    private ImageView iv_no_data_calendar;
 
     private Button btn_navi_center, btn_navi_right, btn_navi_left, btn_recycler_backward, btn_recycler_forward;
     private LinearLayout btn_calendar_next, btn_calendar_pre, ll_recycler_view;
@@ -86,6 +88,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         tv_calendar_month = (TextView) view.findViewById(R.id.tv_calendar_month);
         tv_calendar_day = (TextView) view.findViewById(R.id.tv_calendar_day);
 
+        iv_no_data_calendar = (ImageView) view.findViewById(R.id.iv_no_data_calendar);
+
         btn_navi_center = (Button) ac.findViewById(R.id.btn_navi_center);
         btn_navi_right = (Button) ac.findViewById(R.id.btn_navi_right);
         btn_navi_left = (Button) ac.findViewById(R.id.btn_navi_left);
@@ -113,7 +117,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         btn_navi_right.setEnabled(true);
 
         linearLayoutManager = new LinearLayoutManager(ac);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
         recycler_view.setLayoutManager(linearLayoutManager);
 
@@ -229,7 +233,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 break;
 
             case R.id.btn_recycler_backward:
-                calendar.set(selYear,selMonth,selDate);
+                calendar.set(selYear, selMonth, selDate);
                 calendar.add(Calendar.DAY_OF_WEEK, -1);
                 calendarCalculate();
 
@@ -243,7 +247,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 break;
 
             case R.id.btn_recycler_forward:
-                calendar.set(selYear,selMonth,selDate);
+                calendar.set(selYear, selMonth, selDate);
                 calendar.add(Calendar.DAY_OF_WEEK, 1);
                 calendarCalculate();
 
@@ -314,10 +318,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             recyclerViewAdapter.addItem(time.substring(14, 19), mealoption, String.valueOf(sugar));
         }
 
-        Toast.makeText(ac, String.valueOf(cursorSize), Toast.LENGTH_SHORT).show();
-
-        if (cursorSize == 0);
-
+        if (cursorSize == 0) {
+            iv_no_data_calendar.setVisibility(View.VISIBLE);
+        } else
+            iv_no_data_calendar.setVisibility(View.INVISIBLE);
 
         recycler_view.setAdapter(recyclerViewAdapter);
     }

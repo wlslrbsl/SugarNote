@@ -34,18 +34,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
 
     @Override
     public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        view = LayoutInflater.from(context).inflate(R.layout.recyclerview_custom2, parent, false);
+        view = LayoutInflater.from(context).inflate(R.layout.recyclerview_custom, parent, false);
         viewHolder = new RecyclerViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
-        /*holder.recycler_time.setText(time[position]);
+        holder.recycler_time.setText(time[position]);
         holder.recycler_mealoption.setText(mealoption[position]);
-        holder.recycler_sugar.setText(sugar[position]);*/
+        holder.recycler_sugar.setText(sugar[position]);
 
-        /*switch (mealoption[position]) {
+        switch (mealoption[position]) {
             case "식전" :
                 if(prefs_user.getInt("PRELOW",50) <= Integer.parseInt(sugar[position]) && Integer.parseInt(sugar[position]) <= prefs_user.getInt("PREHIGH",100))
                     holder.recycler_tag.setBackgroundColor(context.getResources().getColor(android.R.color.holo_green_light));
@@ -64,9 +64,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
                 else
                     holder.recycler_tag.setBackgroundColor(context.getResources().getColor(android.R.color.holo_red_light));
                 break;
-        }*/
+        }
 
-        switch (mealoption[position]) {
+        /*switch (mealoption[position]) {
             case "식전":
                 holder.ll_recycler_premeal.setBackgroundResource(R.drawable.border);
                 holder.tv_premeal_sugar.setText(sugar[position]);
@@ -100,7 +100,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
                 else
                     holder.tv_nomeal_sugar.setBackgroundColor(context.getResources().getColor(android.R.color.holo_red_light));
                 break;
-        }
+        }*/
     }
 
     @Override

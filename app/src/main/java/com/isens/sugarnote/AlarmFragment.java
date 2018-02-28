@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ public class AlarmFragment extends Fragment implements View.OnClickListener, Ada
 
     private Button btn_navi_center, btn_navi_left, btn_navi_right;
     private TextView btn_alarm_save, btn_alarm_cancel;
+    private static ImageView iv_noalarm;
 
     private static int alarm_cnt = 0;
 
@@ -67,6 +69,8 @@ public class AlarmFragment extends Fragment implements View.OnClickListener, Ada
         btn_navi_center = (Button) ac.findViewById(R.id.btn_navi_center);
         btn_navi_left = (Button) ac.findViewById(R.id.btn_navi_left);
         btn_navi_right = (Button) ac.findViewById(R.id.btn_navi_right);
+
+        iv_noalarm = (ImageView) view.findViewById(R.id.iv_no_alarm);
 
         list_alarm.setOnItemClickListener(this);
         btn_navi_center.setOnClickListener(this);
@@ -152,6 +156,12 @@ public class AlarmFragment extends Fragment implements View.OnClickListener, Ada
         }
 
         list_alarm.setAdapter(alarmAdapter);
+
+        if(alarm_cnt == 0) {
+            iv_noalarm.setVisibility(View.VISIBLE);
+        } else {
+            iv_noalarm.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override

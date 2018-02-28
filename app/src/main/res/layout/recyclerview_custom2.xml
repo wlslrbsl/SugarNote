@@ -42,7 +42,7 @@
             android:layout_gravity="center"
             android:id="@+id/iv_premeal_empty"
             android:layout_width="80dp"
-            android:layout_height="16dp" />
+            android:layout_height="10dp" />
 
     </FrameLayout>
 
@@ -85,7 +85,7 @@
             android:layout_gravity="center"
             android:id="@+id/iv_postmeal_empty"
             android:layout_width="80dp"
-            android:layout_height="16dp" />
+            android:layout_height="10dp" />
 
     </FrameLayout>
 
@@ -126,7 +126,7 @@
             android:layout_gravity="center"
             android:id="@+id/iv_nomeal_empty"
             android:layout_width="80dp"
-            android:layout_height="16dp" />
+            android:layout_height="10dp" />
 
     </FrameLayout>
 

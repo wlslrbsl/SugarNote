@@ -121,7 +121,6 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                     break;
                 }
                 userName = edt_profile_name.getText().toString();
-                userBirth = edt_profile_birth_year.getText().toString() + edt_profile_birth_month.getText().toString() + edt_profile_birth_day.getText().toString();
 
                 int year = Integer.valueOf(edt_profile_birth_year.getText().toString());
                 int month = Integer.valueOf(edt_profile_birth_month.getText().toString());
@@ -129,8 +128,8 @@ public class UserFragment extends Fragment implements View.OnClickListener {
 
                 String s_year = edt_profile_birth_year.getText().toString();
                 String s_month, s_date;
-                s_month = (month < 10) ? "0" + edt_profile_birth_month.getText().toString() : edt_profile_birth_month.getText().toString();
-                s_date = (month < 10) ? "0" + edt_profile_birth_day.getText().toString() : edt_profile_birth_day.getText().toString();
+                s_month = (month < 10) ? "0" + month : String.valueOf(month);
+                s_date = (date < 10) ? "0" + date : String.valueOf(date);
 
                 userBirth = s_year + s_month + s_date;
 

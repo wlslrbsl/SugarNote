@@ -97,14 +97,14 @@
 
                 </LinearLayout>
 
-                <LinearLayout
+                <FrameLayout
                     android:layout_marginTop="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:orientation="horizontal"
                     android:layout_weight="3">
 
-                    <LinearLayout
+                    <!--<LinearLayout
                         android:orientation="vertical"
                         android:layout_width="40dp"
                         android:layout_height="match_parent">
@@ -136,14 +136,22 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"/>
 
-                    </LinearLayout>
+                    </LinearLayout>-->
+
+                    <ImageView
+                        android:padding="30dp"
+                        android:id="@+id/iv_no_data_calendar"
+                        android:src="@drawable/bg_nodata"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/recycler_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
 
-                </LinearLayout>
+                </FrameLayout>
 
             </LinearLayout>
 

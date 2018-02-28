@@ -11,11 +11,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class AlarmActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button btn_alarm_check;
     private SharedPreferences prefs_root, prefs_user;
+    private TextView tv_active_alarm;
     private String userAccount;
     private SoundPool soundpool;
     private int wavfile;
@@ -23,6 +25,7 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
     private Handler handler2 = new Handler();
     private boolean sound_flag = true, vibe_flag = true;
     private Vibrator vibrator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +33,13 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_alarm);
+
+        tv_active_alarm = (TextView) findViewById(R.id.tv_active_alarm);
+
+        Time time = new Time();
+
+        String active_time = time.getHour_now() + " : " + time.getMin_now();
+        tv_active_alarm.setText(active_time + "\n알람이 울렸습니다.");
 
         soundpool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
         wavfile = soundpool.load(this, R.raw.beep, 1);
@@ -41,12 +51,12 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
         btn_alarm_check = (Button) findViewById(R.id.btn_alarm_check);
         btn_alarm_check.setOnClickListener(this);
 
-        if(prefs_user.getBoolean("SOUND",true)){
+        if (prefs_user.getBoolean("SOUND", true)) {
             sound_flag = true;
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() { // Thread 로 작업할 내용을 구현
-                    while(sound_flag) {
+                    while (sound_flag) {
                         handler.post(new Runnable() {
                             @Override
                             public void run() { // 화면에 변경하는 작업을 구현
@@ -55,20 +65,21 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
                         });
                         try {
                             Thread.sleep(1000); // 시간지연
-                        } catch (InterruptedException e) {    }
+                        } catch (InterruptedException e) {
+                        }
                     } // end of while
                 }
             });
             t.start(); // 쓰레드 시작
         }
 
-        if(prefs_user.getBoolean("VIBE",true)){
+        if (prefs_user.getBoolean("VIBE", true)) {
             vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             vibe_flag = true;
             Thread t2 = new Thread(new Runnable() {
                 @Override
                 public void run() { // Thread 로 작업할 내용을 구현
-                    while(sound_flag) {
+                    while (sound_flag) {
                         handler2.post(new Runnable() {
                             @Override
                             public void run() { // 화면에 변경하는 작업을 구현
@@ -77,7 +88,8 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
                         });
                         try {
                             Thread.sleep(1000); // 시간지연
-                        } catch (InterruptedException e) {    }
+                        } catch (InterruptedException e) {
+                        }
                     } // end of while
                 }
             });

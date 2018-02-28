@@ -19,13 +19,13 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder{
     public RecyclerViewHolder(View itemView) {
         super(itemView);
 
-        /*recycler_tag = (LinearLayout) itemView.findViewById(R.id.recycler_tag);
+        recycler_tag = (LinearLayout) itemView.findViewById(R.id.recycler_tag);
         recycler_mealoption = (TextView) itemView.findViewById(R.id.recycler_mealoption);
         recycler_sugar = (TextView) itemView.findViewById(R.id.recycler_sugar);
         recycler_sugar = (TextView) itemView.findViewById(R.id.recycler_sugar);
-        recycler_time = (TextView) itemView.findViewById(R.id.recycler_time);*/
+        recycler_time = (TextView) itemView.findViewById(R.id.recycler_time);
 
-        ll_recycler_premeal = (LinearLayout) itemView.findViewById(R.id.ll_recycler_premeal);
+        /*ll_recycler_premeal = (LinearLayout) itemView.findViewById(R.id.ll_recycler_premeal);
         ll_recycler_postmeal = (LinearLayout) itemView.findViewById(R.id.ll_recycler_postmeal);
         ll_recycler_nomeal = (LinearLayout) itemView.findViewById(R.id.ll_recycler_nomeal);
 
@@ -38,7 +38,7 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder{
 
         iv_premeal_empty = (ImageView) itemView.findViewById(R.id.iv_premeal_empty);
         iv_postmeal_empty = (ImageView) itemView.findViewById(R.id.iv_postmeal_empty);
-        iv_nomeal_empty = (ImageView) itemView.findViewById(R.id.iv_nomeal_empty);
+        iv_nomeal_empty = (ImageView) itemView.findViewById(R.id.iv_nomeal_empty);*/
 
     }
 
