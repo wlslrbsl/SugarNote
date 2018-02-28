@@ -56,6 +56,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
     private int cursorSize;
     private boolean deleteLogFlag = false, emptyDBFLag = false, initLogFlag;
     private float brightness_val;
+    private String db_name;
 
     public SettingFragment() {
         // Required empty public constructor
@@ -78,6 +79,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
         userAccount = prefs_root.getString("SIGNIN", "none");
         prefs_user = ac.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
+
+        db_name = "GLUCOSEDATA_" + userAccount + ".db";
 
         bright_sb = (SeekBar) view.findViewById(R.id.seekbar_bright);
         sw_setting_sound = (Switch) view.findViewById(R.id.sw_setting_sound);
@@ -129,7 +132,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
         btn_navi_left.setOnClickListener(this);
 
         if (dbHelper == null)
-            dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+            dbHelper = new DBHelper(ac, db_name, null, 1);
 
         db = dbHelper.getWritableDatabase();
 
@@ -243,7 +246,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
                     dialog_DBset.dismiss();
                 } else {
                     if (dbHelper == null)
-                        dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+                        dbHelper = new DBHelper(ac, db_name, null, 1);
                     db = dbHelper.getWritableDatabase();
                     dbHelper.clear_db();
                     emptyDBFLag = true;
@@ -272,7 +275,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
                 break;
 
             case R.id.btn_navi_right:
-                if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+                if (dbHelper == null) dbHelper = new DBHelper(ac, db_name, null, 1);
                 db = dbHelper.getWritableDatabase();
                 dbHelper.clear_db();
                 Toast.makeText(ac, "기기정보", Toast.LENGTH_SHORT).show();
@@ -341,12 +344,12 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
 
     public void DB_Create() {
         String save_date;
-        if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+        if (dbHelper == null) dbHelper = new DBHelper(ac, db_name, null, 1);
         db = dbHelper.getWritableDatabase();
 
         dbHelper.clear_db();
 
-        if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+        if (dbHelper == null) dbHelper = new DBHelper(ac, db_name, null, 1);
         db = dbHelper.getWritableDatabase();
 
         long now = System.currentTimeMillis();

@@ -71,7 +71,7 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
     private final String premeal = "식전", postmeal = "식후", nomeal = "공복";
     private int ll_max_premeal, ll_min_premeal, ll_max_postmeal, ll_min_postmeal, ll_max_nomeal, ll_min_nomeal;
     private int mValue_premeal=0, mValue_postmeal=0, mValue_nomeal=0, max_mValue=0;
-    private String userAccount;
+    private String userAccount, db_name;
     private Handler handler = new Handler(); // Thread 에서 화면에 그리기 위해서 필요
     int value = 0; // progressBar 값
     int add = 1; // 증가량, 방향
@@ -98,8 +98,9 @@ public class ReportStatisticsFragment extends Fragment implements View.OnClickLi
         userAccount = prefs_root.getString("SIGNIN", "none");
         prefs_user = ac.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
+        db_name = "GLUCOSEDATA_" + userAccount + ".db";
 
-        if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+        if (dbHelper == null) dbHelper = new DBHelper(ac, db_name, null, 1);
         db = dbHelper.getWritableDatabase();
 
         Load_Pref();
