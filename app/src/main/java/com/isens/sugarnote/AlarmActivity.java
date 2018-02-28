@@ -27,6 +27,7 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
     private Vibrator vibrator;
 
     private int sound_cnt = 0, vibe_cnt = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +55,7 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
 
         sound_cnt = 0;
         vibe_cnt = 0;
-        if(prefs_user.getBoolean("SOUND",true)){
+
         if (prefs_user.getBoolean("SOUND", true)) {
             sound_flag = true;
             Thread t = new Thread(new Runnable() {
@@ -66,7 +67,7 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
                             public void run() { // 화면에 변경하는 작업을 구현
                                 soundpool.play(wavfile, 1, 1, 0, 0, 1);
                                 sound_cnt = sound_cnt + 1;
-                                if(sound_cnt == 10)
+                                if (sound_cnt == 10)
                                     sound_flag = false;
                             }
                         });
@@ -92,7 +93,7 @@ public class AlarmActivity extends AppCompatActivity implements View.OnClickList
                             public void run() { // 화면에 변경하는 작업을 구현
                                 vibrator.vibrate(500);
                                 vibe_cnt = vibe_cnt + 1;
-                                if(vibe_cnt == 10)
+                                if (vibe_cnt == 10)
                                     sound_flag = false;
                             }
                         });

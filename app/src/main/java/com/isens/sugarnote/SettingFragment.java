@@ -93,20 +93,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
         ac.getWindow().setAttributes(params);
         bright_sb.setProgress((int) brightness_val);
 
-        /*int brightness;
-
-        if (progress < 10) {
-            brightness = 10;
-        } else {
-            brightness = progress;
-        }
-
-        WindowManager.LayoutParams params = ac.getWindow().getAttributes();
-        params.screenBrightness = (float) brightness / 100;
-        ac.getWindow().setAttributes(params);*/
-
-
-
         bright_sb.setOnSeekBarChangeListener(this);
         sw_setting_sound.setOnClickListener(this);
         sw_setting_vibe.setOnClickListener(this);
@@ -117,7 +103,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
 
         btn_log_delete = (Button) view.findViewById(R.id.btn_log_delete);
         btn_db_state_set = (Button) view.findViewById(R.id.btn_db_state_set);
-        btn_log_initial = (Button) view.findViewById(R.id.btn_log_initial);
+        //btn_log_initial = (Button) view.findViewById(R.id.btn_log_initial);
 
         btn_navi_center.setBackgroundResource(R.drawable.state_btn_navi_home);
         btn_navi_left.setBackgroundResource(R.drawable.state_btn_navi_wifi);
@@ -125,7 +111,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
 
         btn_log_delete.setOnClickListener(this);
         btn_db_state_set.setOnClickListener(this);
-        btn_log_initial.setOnClickListener(this);
+        //btn_log_initial.setOnClickListener(this);
 
         btn_navi_center.setOnClickListener(this);
         btn_navi_right.setOnClickListener(this);
@@ -211,7 +197,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
                 dialog_DBset.show();
                 break;
 
-            case R.id.btn_log_initial:
+            /*case R.id.btn_log_initial:
                 dialog_initLog = new Dialog(ac);
                 dialog_initLog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog_initLog.setContentView(R.layout.dialog_default);
@@ -228,7 +214,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener, S
 
                 initLogFlag = true;
                 dialog_initLog.show();
-                break;
+                break;*/
 
             case R.id.btn_dialog_ok:
                 if (deleteLogFlag) {

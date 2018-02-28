@@ -227,7 +227,6 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
                 dbHelper.insert(mdate, gluco, meal_option);
                 _isResultView = false;
 
-                Toast.makeText(ac, "저장완료", Toast.LENGTH_SHORT).show();
                 listener.setFrag("HOME");
 
                 break;

@@ -220,7 +220,6 @@ public class RegisterSecurityFragment extends Fragment implements View.OnClickLi
                 for (int j = 0; j < 4; j++) {
                     password += String.valueOf(pw[j]);
                 }
-                Toast.makeText(mContext, password, Toast.LENGTH_SHORT).show();
                 editor_user.putBoolean("REGISTERED", true);
                 editor_user.commit();
                 fadeOutLinearLayout.start();

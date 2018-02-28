@@ -57,7 +57,7 @@ public class WifiDialog extends Dialog implements View.OnClickListener {
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_wifi);
 
-        tv_wifiInfo = (TextView) findViewById(R.id.tv_wifiInfo);
+        //tv_wifiInfo = (TextView) findViewById(R.id.tv_wifiInfo);
         list_wifi = (ListView) findViewById(R.id.list_wifi);
         sw_wifi_dis = (Switch) findViewById(R.id.sw_wifi_dis);
         btn_wifi_scan = (Button) findViewById(R.id.btn_wifi_scan);
@@ -71,7 +71,7 @@ public class WifiDialog extends Dialog implements View.OnClickListener {
 
         if (!wifi.isWifiEnabled()) {
             sw_wifi_dis.setChecked(false);
-            tv_wifiInfo.setText("Wifi is disabled now");
+            //tv_wifiInfo.setText("Wifi is disabled now");
         } else {
             sw_wifi_dis.setChecked(true);
             btn_wifi_scan.setActivated(false);
@@ -92,25 +92,15 @@ public class WifiDialog extends Dialog implements View.OnClickListener {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (sw_wifi_dis.isChecked()) {
-
                     wifi.setWifiEnabled(true);
-                    Toast.makeText(mContext, "wifi is enabled", Toast.LENGTH_SHORT).show();
+                    btn_wifi_scan.callOnClick();
                     btn_wifi_scan.setActivated(false);
                     refreshInfo();
                 } else {
                     list_wifi.setVisibility(View.INVISIBLE);
                     wifi.setWifiEnabled(false);
-                    Toast.makeText(mContext, "wifi is disabled", Toast.LENGTH_SHORT).show();
-                    tv_wifiInfo.setText("Wifi is disabled now");
+                    //tv_wifiInfo.setText("Wifi is disabled now");
                 }
-            }
-        });
-
-        list_wifi.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(), "길게 눌렀네요!", Toast.LENGTH_SHORT).show();
-                return false;
             }
         });
 
@@ -119,7 +109,7 @@ public class WifiDialog extends Dialog implements View.OnClickListener {
     public void refreshInfo() {
         WifiInfo wifiInfo = wifi.getConnectionInfo();
         String connectionInfo = wifiInfo.getNetworkId() + " : " + wifiInfo.getSSID() + " \n " + wifiInfo.getBSSID();
-        tv_wifiInfo.setText(connectionInfo);
+        //tv_wifiInfo.setText(connectionInfo);
     }
 
     private void connectToWifi(final int position) {

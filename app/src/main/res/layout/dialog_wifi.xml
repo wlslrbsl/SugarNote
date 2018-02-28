@@ -5,19 +5,19 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:background="@drawable/border"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#003269"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
-            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:gravity="center_vertical"
             android:text="Wifi"
-            android:textColor="@android:color/white"
             android:textSize="20dp"
             android:textStyle="bold" />
 
@@ -34,6 +34,8 @@
             android:layout_weight="1" />
 
         <Button
+            android:layout_margin="5dp"
+            android:background="@drawable/state_btn_gray_square"
             android:id="@+id/btn_wifi_scan"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -41,6 +43,8 @@
             android:text="스캔" />
 
         <Button
+            android:layout_margin="5dp"
+            android:background="@drawable/state_btn_gray_square"
             android:id="@+id/btn_wifi_back"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -49,7 +53,7 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -65,7 +69,7 @@
             android:textColor="@android:color/darker_gray"
             android:textStyle="bold" />
 
-    </LinearLayout>
+    </LinearLayout>-->
 
     <LinearLayout
         android:layout_width="match_parent"

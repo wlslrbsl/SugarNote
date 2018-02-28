@@ -471,14 +471,14 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
                     mChart.setVisibleXRangeMaximum(30f);
                     mChart.moveViewToX(end);
                     mChart.invalidate();
-                    Toast.makeText(ac, "1달", Toast.LENGTH_SHORT).show();
+
                 } else {
                     x_Axix_option = during_week;
                     mChart.setVisibleXRangeMinimum(7f);
                     mChart.setVisibleXRangeMaximum(7f);
                     mChart.moveViewToX(end);
                     mChart.invalidate();
-                    Toast.makeText(ac, "1주", Toast.LENGTH_SHORT).show();
+
                 }
             }
 
