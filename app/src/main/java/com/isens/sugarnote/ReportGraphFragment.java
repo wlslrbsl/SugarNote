@@ -73,6 +73,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
     private int x_Axix_option = 1, during_week = 1, during_month = 2;
     int max_yVal_premeal, min_yVal_premeal, max_yVal_postmeal, min_yVal_postmeal, max_yVal_nomeal, min_yVal_nomeal;
     private int mealoption = 1;
+    private String db_name;
 
     public ReportGraphFragment() {
         // Required empty public constructor
@@ -95,7 +96,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
         userAccount = prefs_root.getString("SIGNIN", "none");
         prefs_user = ac.getSharedPreferences(userAccount, 0);
         editor_user = prefs_user.edit();
-
+        db_name = "GLUCOSEDATA_" + userAccount + ".db";
         btn_navi_center = (Button) ac.findViewById(R.id.btn_navi_center);
         btn_navi_right = (Button) ac.findViewById(R.id.btn_navi_right);
         btn_navi_left = (Button) ac.findViewById(R.id.btn_navi_left);
@@ -112,7 +113,7 @@ public class ReportGraphFragment extends Fragment implements View.OnClickListene
 
         init_view();
 
-        if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+        if (dbHelper == null) dbHelper = new DBHelper(ac, db_name, null, 1);
         db = dbHelper.getWritableDatabase();
 
         x_Axix_option = during_week;

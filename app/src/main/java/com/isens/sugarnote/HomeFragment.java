@@ -96,7 +96,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
     private static String dbfilepath2;
     public DriveId mDriveId;
     private static Drive service;
-
+    private String db_name;
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -115,11 +115,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
         prefs_root = ac.getSharedPreferences("ROOT", 0);
         userAccount = prefs_root.getString("SIGNIN", "none");
         prefs_user = ac.getSharedPreferences(userAccount, 0);
+
         editor_user = prefs_user.edit();
         brightness_val = prefs_user.getFloat("BRIGHTNESS",100);
         WindowManager.LayoutParams params = ac.getWindow().getAttributes();
         params.screenBrightness = (float) brightness_val / 100;
         ac.getWindow().setAttributes(params);
+
+        db_name = "GLUCOSEDATA_" + userAccount + ".db";
 
         listviewadapter_power = new CustomAdapterSetting(ac);
         listviewadapter_power.addItem("전원 끄기");
@@ -271,7 +274,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
                     listener.connectAPIClient();
 
                     Query query = new Query.Builder()
-                            .addFilter(Filters.eq(SearchableField.TITLE, "GLUCOSEDATA.db"))
+                            .addFilter(Filters.eq(SearchableField.TITLE, db_name))
                             .build();
                     Log.i("JJ", "sync 버튼 클릭");
 
@@ -378,7 +381,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
     /* 구글 드라이브에 파일 있을 경우 파일 다운로드*/
     private void downloadFromDrive(final DriveFile file) {
 
-        if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+        if (dbHelper == null) dbHelper = new DBHelper(ac, db_name, null, 1);
         db = dbHelper.getWritableDatabase();
 
         file.open(listener.getAPIClient(), DriveFile.MODE_READ_ONLY, null)
@@ -393,7 +396,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
                                 dbfilepath2 = db.getPath();
                                 File dbFile = new File(dbfilepath);
 
-                                saveToDrive(Drive.DriveApi.getRootFolder(listener.getAPIClient()), "GLUCOSEDATA.db", "application/x-sqlite3", dbFile);
+                                saveToDrive(Drive.DriveApi.getRootFolder(listener.getAPIClient()), db_name, "application/x-sqlite3", dbFile);
                             } else {
                                 showMessage(" ERROR jj ");
                             }
@@ -471,7 +474,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
                         }
 
                         if (dbHelper == null)
-                            dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+                            dbHelper = new DBHelper(ac, db_name, null, 1);
                         db = dbHelper.getWritableDatabase();
                         db.getPath();
                         dbfilepath = db.getPath();
@@ -551,14 +554,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
 
                     if (iCount == 0) {
                         if (dbHelper == null)
-                            dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+                            dbHelper = new DBHelper(ac, db_name, null, 1);
                         db = dbHelper.getWritableDatabase();
                         db.getPath();
                         dbfilepath = db.getPath();
                         dbfilepath2 = db.getPath();
                         File dbFile = new File(dbfilepath);
 
-                        saveToDrive(Drive.DriveApi.getRootFolder(listener.getAPIClient()), "GLUCOSEDATA.db", "application/x-sqlite3", dbFile);
+                        saveToDrive(Drive.DriveApi.getRootFolder(listener.getAPIClient()), db_name, "application/x-sqlite3", dbFile);
                     } else {
                         String file_name = "";
                         file_name = mdbf.get(0).getTitle();

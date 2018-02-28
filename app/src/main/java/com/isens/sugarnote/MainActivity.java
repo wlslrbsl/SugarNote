@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private Calendar calendar;
     private Cursor cursor;
     private long now;
-    private String userAccount;
+    private String userAccount, db_name;
     private boolean ready_flag = false, repeat_flag = false;
     private int status_bgm;
     // BGM CB register
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
         prefs_root = getSharedPreferences("ROOT", 0);
         userAccount = prefs_root.getString("SIGNIN", "none");
         prefs_user = getSharedPreferences(userAccount, 0);
-
+        db_name = "GLUCOSEDATA_" + userAccount + ".db";
         homeFragment = new HomeFragment();
         userFragment = new UserFragment();
         measureFragment = new MeasureFragment();
@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterActi
     private void get_Today_Glucose_Data(){
 
         if (dbHelper == null)
-            dbHelper = new DBHelper(this, "GLUCOSEDATA.db", null, 1);
+            dbHelper = new DBHelper(this, db_name, null, 1);
 
         db = dbHelper.getWritableDatabase();
 

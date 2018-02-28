@@ -3,6 +3,7 @@ package com.isens.sugarnote;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.GradientDrawable;
@@ -34,7 +35,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     private Activity ac;
     private View view;
-
+    private SharedPreferences prefs_root;
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private RecyclerViewAdapter recyclerViewAdapter;
@@ -58,6 +59,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private String month = "", date = "", time, mealoption, calendar_head;
     private int whatDay, whatDate, tmpDate, tmpDay, maxDate, firstDay, whatMonth, whatYear, selYear, selMonth, selDate, sugar, cursorSize, selDay;
     private long now;
+    private String db_name, userAccount;
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -76,6 +78,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         ac = getActivity();
         view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
+        prefs_root = ac.getSharedPreferences("ROOT", 0);
+        userAccount = prefs_root.getString("SIGNIN", "none");
+        db_name = "GLUCOSEDATA_" + userAccount + ".db";
         drawer_layout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
         drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
@@ -122,7 +127,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         recycler_view.setLayoutManager(linearLayoutManager);
 
         if (dbHelper == null)
-            dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+            dbHelper = new DBHelper(ac, db_name, null, 1);
 
         setToday();
         setDrawer();

@@ -75,6 +75,7 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
     private Handler handler = new Handler(); // Thread 에서 화면에 그리기 위해서 필요
     private final int premeal = 1, postmeal = 2, nomeal = 3;
     private boolean target_accept;
+    private String db_name;
 
     public MeasureFragment() {
         // Required empty public constructor
@@ -119,6 +120,7 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
 
         prefs_root = ac.getSharedPreferences("ROOT", 0);
         userAccount = prefs_root.getString("SIGNIN", "none");
+        db_name = "GLUCOSEDATA_" + userAccount + ".db";
         prefs_user = ac.getSharedPreferences(userAccount, 0);
 
         _progress_bar = (ProgressBar) view.findViewById(R.id.circle_progress);
@@ -158,7 +160,7 @@ public class MeasureFragment extends Fragment implements View.OnClickListener {
         premeal_btn.setTextColor(Color.BLUE);
 
         if (_handler == null)
-            if (dbHelper == null) dbHelper = new DBHelper(ac, "GLUCOSEDATA.db", null, 1);
+            if (dbHelper == null) dbHelper = new DBHelper(ac, db_name, null, 1);
 
         if (_handler == null)
             _handler = new Handler(Looper.getMainLooper());
