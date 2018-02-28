@@ -3,6 +3,7 @@ package com.isens.sugarnote;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +29,8 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
     private static final int RC_SIGN_IN = 9001;
     private SharedPreferences prefs_root, prefs_user;
     private SharedPreferences.Editor editor_root, editor_user;
+
+    private WifiManager wifi;
 
     private Dialog dialog_addLog, dialog_debug;
 
@@ -61,6 +64,8 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         btn_logo.setOnLongClickListener(this);
         tv_version.setOnLongClickListener(this);
 
+        wifi = (WifiManager) getApplicationContext().getSystemService(this.WIFI_SERVICE);
+
         prefs_root = getSharedPreferences("ROOT", 0);
         editor_root = prefs_root.edit();
 
@@ -81,18 +86,25 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         switch (view.getId()) {
 
             case R.id.btn_log_in_google:
-                Intent signInIntent = MyApplication.mGoogleSignInClient.getSignInIntent();
-                startActivityForResult(signInIntent, RC_SIGN_IN);
 
-                signInFlag = true;
+                if (wifi.isWifiEnabled()) {
+                    Intent signInIntent = MyApplication.mGoogleSignInClient.getSignInIntent();
+                    startActivityForResult(signInIntent, RC_SIGN_IN);
 
+                    signInFlag = true;
+                } else {
+                    WifiDialog dialog = new WifiDialog(this);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.dialog_wifi);
+                    dialog.show();
+                }
                 break;
 
             case R.id.btn_log_in_local:
                 editor_root.putString("SIGNIN", "LOCAL");
                 editor_root.commit();
-                prefs_user = getSharedPreferences("LOCAL",0);
-                if(prefs_user.getBoolean("REGISTERED", false)) {
+                prefs_user = getSharedPreferences("LOCAL", 0);
+                if (prefs_user.getBoolean("REGISTERED", false)) {
                     Intent intent_main = new Intent(LogInActivity.this, MainActivity.class);
                     startActivity(intent_main);
                 } else {
@@ -102,11 +114,6 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.tv_version:
-                //account = GoogleSignIn.getLastSignedInAccount(this);
-                /*revoke();
-                if (account != null) {
-                    //tv_test.setText(account.getDisplayName() + "\n" + account.getEmail() + "\n" + account.getGivenName() + "\n" + account.getFamilyName() + "\n" + account.getId());
-                }*/
                 break;
 
             case R.id.btn_dialog_ok:

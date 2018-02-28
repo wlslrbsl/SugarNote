@@ -200,15 +200,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, List
 
                 dialog_logout.show();
 
-//                dialog_power = new Dialog(ac);
-//                dialog_power.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//                dialog_power.setContentView(R.layout.dialog_power);
-//
-//                listview = (ListView) dialog_power.findViewById(R.id.Listview_Power);
-//                listview.setAdapter(listviewadapter_power);
-//                listview.setOnItemClickListener(this);
-//
-//                dialog_power.show();
                 break;
 
             case R.id.btn_navi_left:
